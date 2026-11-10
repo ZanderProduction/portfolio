@@ -343,3 +343,4 @@ html{overflow-x:clip}
 .bubble--hot.bar.is-filled{background-size:100% 100%;border-color:var(--accent)}
 .bubble--hot.bar.is-filled b,.bubble--hot.bar.is-filled span{color:var(--black)}
 @media (max-width:560px){.bubble--hot.bar b{transition-delay:.45s}}
+.about__text p:last-child{margin-bottom:0}
