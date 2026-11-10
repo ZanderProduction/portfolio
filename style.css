@@ -473,3 +473,19 @@ html{overflow-x:clip}
 .bubbles--one{grid-template-columns:1fr}
 @media (max-width:760px){.bsl{grid-template-columns:1fr}.bsl__reel{max-width:420px}}
 .jump a.jump__dl{background:var(--ink);color:var(--paper);border-color:var(--ink)}.jump a.jump__dl:hover{background:var(--accent);border-color:var(--accent);color:var(--black)}
+
+/* big "See all work" button on the home page */
+.allwork{position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;margin-top:clamp(34px,4vw,52px);padding:clamp(20px,2.6vw,30px) clamp(20px,3vw,36px);border:2px solid var(--accent);color:var(--ink);text-decoration:none;isolation:isolate;transition:color .35s ease}
+.allwork::before{content:"";position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.7,0,.2,1);z-index:-1}
+.allwork__txt{font-weight:900;font-stretch:64%;text-transform:uppercase;font-size:clamp(34px,5vw,72px);line-height:.9;letter-spacing:-.01em}
+.allwork__count{font-weight:700;font-size:15px;color:var(--muted);transition:color .35s}
+.allwork i{margin-left:auto;font-style:normal;font-weight:800;font-size:clamp(34px,4.6vw,64px);line-height:1;color:var(--accent);transition:color .35s,transform .35s;animation:nudge 1.8s ease-in-out infinite}
+.allwork:hover,.allwork:active,.allwork:focus-visible{color:var(--black)}
+.allwork:hover::before,.allwork:active::before,.allwork:focus-visible::before{transform:scaleX(1)}
+.allwork:hover .allwork__count,.allwork:active .allwork__count{color:var(--black)}
+.allwork:hover i,.allwork:active i{color:var(--black);animation:none;transform:translateX(8px)}
+@keyframes nudge{0%,100%{transform:none}50%{transform:translateX(8px)}}
+@media (max-width:560px){.allwork{flex-wrap:wrap;gap:4px 14px}.allwork__count{order:3;width:100%}.allwork i{order:2}}
+@media (prefers-reduced-motion:reduce){.allwork i{animation:none}}
+.section__more--btn{border:2px solid var(--accent);padding:10px 16px;text-decoration:none;font-size:16px;transition:background .25s,color .25s}
+.section__more--btn:hover{background:var(--accent);color:var(--black)}

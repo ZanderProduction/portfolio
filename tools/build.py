@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "46"  # bump to make browsers fetch fresh css/js
+V = "47"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -190,11 +190,11 @@ CASES = [
          line="Two guys, a list of challenges, no polish on purpose. The tone of the show was made in the edit.",
          role="Main camera and editor on both episodes, trailer"),
     dict(slug="the-mix-up", title="The Mix Up!", video="7jMX52GM8R4", thumb=yt_thumb("7jMX52GM8R4"),
-         tag="Short film / 24-hour challenge",
+         home=False, tag="Short film / 24-hour challenge",
          line="One rule: start to finish in a day. Planned, shot and edited before the deadline.",
          role="Planning, camera and edit, solo"),
     dict(slug="week-with-zander", title="Week with Zander", video="hCSl4K2XNrE", thumb=yt_thumb("hCSl4K2XNrE"),
-         tag="Vlog series / YouTube",
+         home=False, tag="Vlog series / YouTube",
          line="My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.",
          role="Filming and editing, every episode"),
     dict(slug="vsa-music-videos", title="VSA music videos", video="sZbNW_AUgt0", thumb=yt_thumb("sZbNW_AUgt0"),
@@ -304,11 +304,12 @@ def page_home():
 <section class="section">
   <div class="section__head">
     <h2 class="h-xl">Selected work</h2>
-    <a class="section__more" href="work/">All work →</a>
+    <a class="section__more section__more--btn" href="work/">All work →</a>
   </div>
   <div class="cards">
 {all_cards(p, home=True)}
   </div>
+  <a class="allwork" href="work/"><span class="allwork__txt">See all work</span><span class="allwork__count">{len(CASES)} projects</span><i aria-hidden="true">→</i></a>
 {logos(p)}
 </section>
 """ + contact_band(p) + foot(p)
