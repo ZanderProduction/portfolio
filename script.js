@@ -181,6 +181,38 @@ document.querySelectorAll(".episodes").forEach((box) => {
   window.addEventListener("resize", () => { if (window.innerWidth > 760) set(false); });
 })();
 
+// Address bar follows the section you're in (#work, #music, #about, #contact)
+(() => {
+  const ids = ["work", "music", "about", "contact"];
+  const sections = ids.map((id) => document.getElementById(id)).filter(Boolean);
+  const navLinks = [...document.querySelectorAll('.nav__links a, .mmenu__links a')];
+  let current = null, ticking = false;
+  const update = () => {
+    ticking = false;
+    const line = window.innerHeight * 0.35;
+    let active = null;
+    for (const s of sections) if (s.getBoundingClientRect().top <= line) active = s.id;
+    if (active === current) return;
+    current = active;
+    const url = active ? "#" + active : location.pathname + location.search;
+    history.replaceState(null, "", url);
+    navLinks.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === "#" + active));
+  };
+  window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+
+  // On refresh with #section: land on it again once images and sliders have loaded
+  if (location.hash && ids.includes(location.hash.slice(1))) {
+    const target = document.getElementById(location.hash.slice(1));
+    let userScrolled = false;
+    const mark = () => { userScrolled = true; };
+    ["wheel", "touchmove", "keydown"].forEach((e) => window.addEventListener(e, mark, { once: true, passive: true }));
+    const jump = () => { if (!userScrolled) target.scrollIntoView({ behavior: "instant", block: "start" }); };
+    requestAnimationFrame(jump);
+    window.addEventListener("load", () => setTimeout(jump, 50));
+  }
+  update();
+})();
+
 // Build sliders
 document.querySelectorAll(".slider").forEach((slider) => {
   const name = slider.dataset.list;

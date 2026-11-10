@@ -328,3 +328,7 @@ ul,ol{list-style:none}
   .contact__grid{min-width:0}
 }
 html,body{overflow-x:clip}
+
+/* current section in the menu */
+.nav__links a.is-active{color:var(--accent)}
+.mmenu__links a.is-active span{text-decoration:underline;text-underline-offset:3px}
