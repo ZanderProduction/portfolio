@@ -334,3 +334,11 @@ html{overflow-x:clip}
 .nav__links a.is-active{color:var(--accent)}
 .mmenu__links a.is-active span{text-decoration:underline;text-underline-offset:3px}
 .about > *,.cvgrid > *,.contact__grid > *,.project > *,.insta > *{min-width:0}
+
+/* views bubble fills up like a bar */
+.bubble--hot.bar{background:var(--paper-2) linear-gradient(var(--accent),var(--accent)) no-repeat left/0% 100%;border-color:var(--line);transition:background-size 1.4s cubic-bezier(.33,1,.68,1),border-color .4s,transform .3s}
+.bubble--hot.bar b{color:var(--accent);transition:color .25s .15s}
+.bubble--hot.bar span{color:var(--muted);transition:color .3s .6s}
+.bubble--hot.bar.is-filled{background-size:100% 100%;border-color:var(--accent)}
+.bubble--hot.bar.is-filled b,.bubble--hot.bar.is-filled span{color:var(--black)}
+@media (max-width:560px){.bubble--hot.bar b{transition-delay:.45s}}

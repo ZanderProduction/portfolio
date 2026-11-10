@@ -350,8 +350,14 @@ const runCount = (el) => {
   requestAnimationFrame(step);
 };
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.querySelectorAll(".bubble--hot").forEach((b) => b.classList.add("bar"));
   const co = new IntersectionObserver((entries) => entries.forEach((en) => {
-    if (en.isIntersecting) { runCount(en.target); co.unobserve(en.target); }
+    if (en.isIntersecting) {
+      runCount(en.target);
+      const bar = en.target.closest(".bar");
+      if (bar) bar.classList.add("is-filled");
+      co.unobserve(en.target);
+    }
   }), { threshold: 0.6 });
   counters.forEach((c) => co.observe(c));
 }
