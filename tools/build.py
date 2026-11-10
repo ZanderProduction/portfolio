@@ -104,7 +104,7 @@ def contact(p, title="Let's work<br>together",
             lead="Email is the fastest way to reach me. I can travel anywhere in the Netherlands and do an online call any time.",
             booking=False):
     book = ('<div><dt>Bookings</dt><dd><a href="mailto:djzanderrbooking@gmail.com">djzanderrbooking@gmail.com</a></dd></div>'
-            '<div><dt>Rider</dt><dd><a href="DJZander-Rider.pdf" download>Technical rider, PDF ↓</a></dd></div>'
+            '<div><dt>Rider</dt><dd><a href="DJZander-Rider.pdf?v=3" download>Technical rider, PDF ↓</a></dd></div>'
             if booking else "")
     return f"""
 <!-- ================= CONTACT ================= -->
@@ -508,7 +508,7 @@ def page_dj():
     <p>Playing for a crowd every weekend teaches you to read a room and change plans on the spot. That's the same thing I do in an edit. Remixes, mashups and my own tracks are past <b>500,000 streams on Spotify</b> and <b>1.5 million views on YouTube</b>.</p>
   </div>
   <nav class="jump" aria-label="On this page">
-    <a href="#shows">Shows</a><a href="#content">Social content</a><a href="#posters">Posters</a><a href="#music">Music</a><a href="#contact">Book a show</a><a class="jump__dl" href="DJZander-Rider.pdf" download>Tech rider ↓</a>
+    <a href="#shows">Shows</a><a href="#content">Social content</a><a href="#posters">Posters</a><a href="#music">Music</a><a href="#contact">Book a show</a><a class="jump__dl" href="DJZander-Rider.pdf?v=3" download>Tech rider ↓</a>
   </nav>
 </section>
 </div>
