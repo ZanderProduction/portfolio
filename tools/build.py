@@ -304,7 +304,6 @@ def page_home():
 <section class="section">
   <div class="section__head">
     <h2 class="h-xl">Selected work</h2>
-    <a class="section__more section__more--btn" href="work/">All work →</a>
   </div>
   <div class="cards">
 {all_cards(p, home=True)}
