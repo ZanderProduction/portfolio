@@ -231,9 +231,10 @@ document.querySelectorAll(".episodes").forEach((box) => {
         };
         if ("onscrollend" in window) window.addEventListener("scrollend", settle, { once: true });
         setTimeout(settle, 1100);
+        setTimeout(settle, 2200);
       };
       // wait one frame so the phone menu has released the page before scrolling
-      requestAnimationFrame(() => requestAnimationFrame(go));
+      setTimeout(go, 40);
     });
   });
 })();
