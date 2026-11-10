@@ -395,9 +395,8 @@ html{overflow-x:clip}
 /* social page: numbers on top, then text + screenshots */
 .insta--case{margin-top:0;padding-top:0;border-top:0;grid-template-columns:1fr 1fr}
 .insta--case .bubbles{margin-bottom:clamp(20px,3vw,32px)}
-.insta--case .insta__text{position:sticky;top:96px}
 .insta--case .insta__text p:not(.label):not(.links){color:var(--muted);margin-top:10px;font-size:18px}
-@media (max-width:860px){.insta--case{grid-template-columns:1fr}.insta--case .insta__text{position:static}}
+@media (max-width:860px){.insta--case{grid-template-columns:1fr}}
 
 /* the views bar can be emptied without animating backwards */
 .bubble--hot.bar.no-anim,.bubble--hot.bar.no-anim b,.bubble--hot.bar.no-anim span{transition:none}
@@ -462,4 +461,3 @@ html{overflow-x:clip}
 .cband__more{font-weight:700;text-decoration:none}
 .contact--page{min-height:calc(100vh - 120px)}
 .hero__bottom--solo{grid-template-columns:1fr}.hero__bottom--solo .hero__intro{max-width:46ch}
-@media (min-width:1000px){.cards--three{grid-template-columns:repeat(3,minmax(0,1fr))}.cards--three .card h3{font-size:clamp(30px,2.8vw,42px)}}

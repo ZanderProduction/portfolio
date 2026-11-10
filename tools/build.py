@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "42"  # bump to make browsers fetch fresh css/js
+V = "43"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -188,6 +188,10 @@ CASES = [
          tag="Challenge series / 2 episodes + trailer",
          line="Two guys, a list of challenges, no polish on purpose. The tone of the show was made in the edit.",
          role="Main camera and editor on both episodes, trailer"),
+    dict(slug="week-with-zander", title="Week with Zander", video="G71JpTXkimw", thumb=yt_thumb("G71JpTXkimw"),
+         tag="Vlog series / YouTube",
+         line="My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.",
+         role="Filming and editing, every episode"),
     dict(slug="the-mix-up", title="The Mix Up!", video="7jMX52GM8R4", thumb=yt_thumb("7jMX52GM8R4"),
          tag="Short film / 24-hour challenge",
          line="One rule: start to finish in a day. Planned, shot and edited before the deadline.",
@@ -210,10 +214,8 @@ def card(p, x, href, more="See the project →"):
     </a>"""
 
 
-def all_cards(p, dj=True):
+def all_cards(p):
     c = [card(p, x, f"{p}work/{x['slug']}/") for x in CASES]
-    if dj:
-        c.insert(2, card(p, ZANDER, f"{p}dj/", "See DJZander →"))
     return "\n".join(c)
 
 
@@ -308,22 +310,22 @@ def page_work():
                 "Series, short film and social content by Alexandar Ivanov.") + nav(p, "work") + simple_head(
         "Work", "Series, short film and social content. Open a project for the full story, the credits and the episodes.") + f"""
 <section class="section section--case">
-  <div class="cards cards--three">
-{all_cards(p, dj=False)}
+  <div class="cards">
+{all_cards(p)}
   </div>
 {logos(p)}
 </section>
 """ + contact_band(p) + foot(p)
 
 
-def case_page(x, title, desc, intro, credits, facts, extra=""):
+def case_page(x, title, desc, intro, credits, facts, extra="", caption=None):
     p = "../../"
     cr = "".join(f"<div><dt>{a}</dt><dd>{b}</dd></div>" for a, b in credits)
     fa = "".join(f"<div><dt>{a}</dt><dd>{b}</dd></div>" for a, b in facts)
     return head(p, title, desc) + nav(p, "work") + case_head(p, x, intro) + f"""
 <section class="section section--case">
   <div class="yt yt--big" data-id="{x['video']}" data-title="{x['title']}"></div>
-  <p class="case__caption">{"The trailer, cut by me." if x["slug"] != "the-mix-up" else "The full film."}</p>
+  <p class="case__caption">{caption or "The trailer, cut by me."}</p>
 
   <div class="case">
     <div>
@@ -363,7 +365,24 @@ def page_mixup():
         "Short film made in 24 hours. Planning, camera and edit by Alexandar Ivanov.",
         "A semester assignment with one rule: start to finish in a day. I planned the shoot, filmed it and delivered the final edit before the deadline.",
         [("Planning", "solo"), ("Camera", "solo"), ("Editor", "solo")],
-        [("Format", "short film"), ("Deadline", "24 hours"), ("Context", "semester assignment")])
+        [("Format", "short film"), ("Deadline", "24 hours"), ("Context", "semester assignment")],
+        caption="The full film.")
+
+
+def page_wwz():
+    return case_page(CASES[2], "Week with Zander - Alexandar Ivanov",
+        "Vlog series about gigs, travel and training. Filmed and edited by Alexandar Ivanov.",
+        "My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.",
+        [("Idea", "my own series"), ("Camera", "me"), ("Editor", "every episode")],
+        [("Format", "vlog series"), ("Topics", "gigs, travel, training"), ("Where", "YouTube")],
+        '''<div class="row">
+    <div class="row__head row__head--inline">
+      <h3>All episodes</h3>
+      <p>Gigs, trips and training, plus a few extras.</p>
+    </div>
+    <div class="slider" data-list="VLOGS"></div>
+  </div>''',
+        caption="Episode 1: DJing a silent disco.")
 
 
 def page_about():
@@ -488,14 +507,6 @@ def page_dj():
     </div>
     <div id="reels" class="reels"></div>
   </div>
-
-  <div class="row">
-    <div class="row__head">
-      <h3>Week with Zander</h3>
-      <p>My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.</p>
-    </div>
-    <div class="slider" data-list="VLOGS"></div>
-  </div>
 </section>
 </div>
 
@@ -589,6 +600,7 @@ if __name__ == "__main__":
     write("work/index.html", page_work())
     write("work/what-is-this-place/index.html", page_witp())
     write("work/are-you-mental/index.html", page_aym())
+    write("work/week-with-zander/index.html", page_wwz())
     write("work/the-mix-up/index.html", page_mixup())
     write("work/social-content/index.html", REDIRECT.format(to="../../dj/#content"))
     write("dj/index.html", page_dj())
