@@ -182,6 +182,9 @@ document.querySelectorAll(".episodes").forEach((box) => {
   window.addEventListener("resize", () => { if (window.innerWidth > 760) set(false); });
 })();
 
+// While a menu click is scrolling, the highlight and address show where you're going, not every section passed
+const navLock = { id: undefined };
+
 // Address bar follows the section you're in (#work, #music, #about, #contact)
 (() => {
   const ids = ["work", "music", "about", "contact"];
@@ -195,6 +198,7 @@ document.querySelectorAll(".episodes").forEach((box) => {
     for (const s of sections) if (s.getBoundingClientRect().top <= line) active = s.id;
     const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4;
     if (atBottom && sections.length) active = sections[sections.length - 1].id;
+    if (navLock.id !== undefined) active = navLock.id;
     if (active === current) return;
     current = active;
     const url = active ? "#" + active : location.pathname + location.search;
@@ -202,6 +206,7 @@ document.querySelectorAll(".episodes").forEach((box) => {
     navLinks.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === (active ? "#" + active : "#top")));
   };
   window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  navLock.refresh = update;
 
   // On refresh with #section: land on it again once images and sliders have loaded
   if (location.hash && ids.includes(location.hash.slice(1))) {
@@ -216,38 +221,54 @@ document.querySelectorAll(".episodes").forEach((box) => {
   update();
 })();
 
-// Menu clicks: scroll to the section, then correct if anything above it changed size meanwhile
+// Menu clicks (sections and Home): one scroll at a time. A new click cancels everything
+// left over from the previous one, so fast clicking can't pull the page back to an older target.
 (() => {
   const navH = () => (document.querySelector(".nav")?.offsetHeight || 64);
-  const topOf = (el) => el.getBoundingClientRect().top + window.scrollY - navH();
+  let timers = [], onEnd = null, job = 0;
+  const cancel = () => {
+    timers.forEach(clearTimeout); timers = [];
+    if (onEnd) { window.removeEventListener("scrollend", onEnd); onEnd = null; }
+  };
+  const release = () => { cancel(); navLock.id = undefined; navLock.refresh && navLock.refresh(); };
+  // the visitor scrolling by hand takes over straight away
+  ["wheel", "touchstart", "keydown"].forEach((ev) =>
+    window.addEventListener(ev, () => { if (navLock.id !== undefined) release(); }, { passive: true }));
+
+  const goTo = (id) => {
+    cancel();
+    const my = ++job;
+    const el = id ? document.getElementById(id) : null;
+    const target = () => (el ? Math.max(0, el.getBoundingClientRect().top + window.scrollY - navH()) : 0);
+    navLock.id = id;                       // null = Home
+    navLock.refresh && navLock.refresh();  // highlight the clicked link right away
+    const scroll = () => { if (my === job) window.scrollTo({ top: target(), behavior: "smooth" }); };
+    const settle = () => {
+      if (my !== job) return;
+      const off = Math.abs(window.scrollY - target());
+      const maxY = document.documentElement.scrollHeight - window.innerHeight;
+      if (off > 3 && !(window.scrollY >= maxY - 2 && target() >= maxY)) scroll();
+    };
+    // wait a moment so the phone menu has released the page before scrolling
+    timers.push(setTimeout(scroll, 40));
+    if ("onscrollend" in window) {
+      onEnd = () => { settle(); };
+      timers.push(setTimeout(() => { if (my === job) window.addEventListener("scrollend", onEnd); }, 60));
+    }
+    timers.push(setTimeout(settle, 1100));
+    timers.push(setTimeout(settle, 2000));
+    timers.push(setTimeout(() => { if (my === job) release(); }, 2600));
+  };
+
   document.querySelectorAll('a[href^="#"]').forEach((a) => {
     const id = a.getAttribute("href").slice(1);
-    const el = id && id !== "top" ? document.getElementById(id) : null;
-    if (!el) return;
+    if (id !== "top" && !document.getElementById(id)) return;
     a.addEventListener("click", (e) => {
       e.preventDefault();
-      const go = () => {
-        window.scrollTo({ top: topOf(el), behavior: "smooth" });
-        const settle = () => {
-          const off = el.getBoundingClientRect().top - navH();
-          if (Math.abs(off) > 3) window.scrollTo({ top: topOf(el), behavior: "smooth" });
-        };
-        if ("onscrollend" in window) window.addEventListener("scrollend", settle, { once: true });
-        setTimeout(settle, 1100);
-        setTimeout(settle, 2200);
-      };
-      // wait one frame so the phone menu has released the page before scrolling
-      setTimeout(go, 40);
+      goTo(id === "top" ? null : id);
     });
   });
 })();
-
-// Home: back to the very top
-document.querySelectorAll('a[href="#top"]').forEach((a) => a.addEventListener("click", (e) => {
-  e.preventDefault();
-  setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 40);
-  history.replaceState(null, "", location.pathname + location.search);
-}));
 
 // Build sliders
 document.querySelectorAll(".slider").forEach((slider) => {
