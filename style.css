@@ -461,3 +461,5 @@ html{overflow-x:clip}
 .cband__mail:hover,.cband__more:hover{text-decoration:underline;text-underline-offset:4px}
 .cband__more{font-weight:700;text-decoration:none}
 .contact--page{min-height:calc(100vh - 120px)}
+.hero__bottom--solo{grid-template-columns:1fr}.hero__bottom--solo .hero__intro{max-width:46ch}
+@media (min-width:1000px){.cards--three{grid-template-columns:repeat(3,minmax(0,1fr))}.cards--three .card h3{font-size:clamp(30px,2.8vw,42px)}}

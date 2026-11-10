@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "41"  # bump to make browsers fetch fresh css/js
+V = "42"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -46,7 +46,7 @@ def head(p, title, desc):
 
 
 def nav(p, page):
-    links = [("Home", p or "./", "home"), ("Work", p + "work/", "work"), ("Zander Production", p + "dj/", "dj"),
+    links = [("Home", p or "./", "home"), ("Work", p + "work/", "work"), ("DJZander", p + "dj/", "dj"),
              ("About", p + "about/", "about"), ("Contact", p + "contact/", "contact")]
     act = lambda k: ' class="is-active" aria-current="page"' if k == page else ""
     subs = [(x["title"], f'{p}work/{x["slug"]}/') for x in CASES]
@@ -60,7 +60,7 @@ def nav(p, page):
             top.append(f'<a href="{h}"{act(k)}>{t}</a>')
     mob = []
     for i, (t, h, k) in enumerate(links):
-        label = t.replace("Zander Production", "Zander<br>Production")
+        label = t
         if k == "work":
             mob.append(f'<div class="mmenu__group"><div class="mmenu__row"><a href="{h}"{act(k)}><span>{i:02d}</span>{label}</a>'
                        f'<button class="mmenu__more" type="button" aria-expanded="false" aria-label="Show projects">+</button></div>'
@@ -101,7 +101,10 @@ def nav(p, page):
 
 
 def contact(p, title="Let's work<br>together",
-            lead="Email is the fastest way to reach me. I can travel anywhere in the Netherlands and do an online call any time."):
+            lead="Email is the fastest way to reach me. I can travel anywhere in the Netherlands and do an online call any time.",
+            booking=False):
+    book = ('<div><dt>Bookings</dt><dd><a href="mailto:djzanderrbooking@gmail.com">djzanderrbooking@gmail.com</a></dd></div>'
+            if booking else "")
     return f"""
 <!-- ================= CONTACT ================= -->
 <section class="contact" id="contact">
@@ -111,7 +114,7 @@ def contact(p, title="Let's work<br>together",
       <div>
         <p class="contact__lead">{lead}</p>
         <dl class="contact__list">
-          <div><dt>Email</dt><dd><a href="mailto:{EMAIL}">{EMAIL}</a></dd></div>
+          {book}<div><dt>Email</dt><dd><a href="mailto:{EMAIL}">{EMAIL}</a></dd></div>
           <div><dt>Phone</dt><dd><a href="tel:+31635636476">+31 6 3563 6476</a></dd></div>
           <div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/alexandar-ivanov-79539a228/" target="_blank" rel="noopener">Alexandar Ivanov ↗</a></dd></div>
           <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/djzanderr/" target="_blank" rel="noopener">@djzanderr ↗</a></dd></div>
@@ -145,7 +148,7 @@ def foot(p):
 
 <footer class="footer">
   <span>© <span id="year">2026</span> Alexandar Ivanov / Zander Production</span>
-  <a href="{p}dj/">Zander Production</a>
+  <a href="{p}dj/">DJZander</a>
 </footer>
 
 <a href="#top" class="totop" aria-label="Back to the top"><span aria-hidden="true">↑</span></a>
@@ -190,7 +193,7 @@ CASES = [
          line="One rule: start to finish in a day. Planned, shot and edited before the deadline.",
          role="Planning, camera and edit, solo"),
 ]
-ZANDER = dict(title="Zander Production", thumb=PHOTO_CLUB,
+ZANDER = dict(title="DJZander", thumb=PHOTO_CLUB,
               tag="Social content / DJ and MC business",
               line="My own DJ and MC business, and the channel I film and edit for it: 1,003,763 views between 31 May and 7 July, with no team.",
               role="Bookings, DJ and MC, filming, editing and posting")
@@ -207,9 +210,10 @@ def card(p, x, href, more="See the project →"):
     </a>"""
 
 
-def all_cards(p):
+def all_cards(p, dj=True):
     c = [card(p, x, f"{p}work/{x['slug']}/") for x in CASES]
-    c.insert(2, card(p, ZANDER, f"{p}dj/", "See Zander Production →"))
+    if dj:
+        c.insert(2, card(p, ZANDER, f"{p}dj/", "See DJZander →"))
     return "\n".join(c)
 
 
@@ -258,14 +262,8 @@ HERO = """
     <p class="hero__caption" id="hero-caption">Now playing: What Is This Place? - series trailer. Camera, editing and trailer cut by me.</p>
   </div>
 
-  <div class="hero__bottom">
+  <div class="hero__bottom hero__bottom--solo">
     <p class="hero__intro">I make <b>series, short film and social content</b>. Fourth-year Creative Business student at NHL Stenden, looking for a <b>media production internship from February 2027</b>.</p>
-    <dl class="hero__facts">
-      <div><dt>Based in</dt><dd>The Netherlands</dd></div>
-      <div><dt>Available</dt><dd>From Feb 2027</dd></div>
-      <div><dt>Shoot on</dt><dd>Canon 90D</dd></div>
-      <div><dt>Edit in</dt><dd>DaVinci, Premiere</dd></div>
-    </dl>
   </div>
 </section>
 </div>
@@ -310,8 +308,8 @@ def page_work():
                 "Series, short film and social content by Alexandar Ivanov.") + nav(p, "work") + simple_head(
         "Work", "Series, short film and social content. Open a project for the full story, the credits and the episodes.") + f"""
 <section class="section section--case">
-  <div class="cards">
-{all_cards(p)}
+  <div class="cards cards--three">
+{all_cards(p, dj=False)}
   </div>
 {logos(p)}
 </section>
@@ -432,12 +430,12 @@ def page_contact():
 
 def page_dj():
     p = "../"
-    return head(p, "Zander Production - DJ, MC & content",
-                "DJ, MC and event content by Zander Production. 1,003,763 Instagram views between 31 May and 7 July, clubs, concerts and private events.") + nav(p, "dj") + f"""
+    return head(p, "DJZander - DJ, MC & content",
+                "DJ, MC and event content by DJZander. 1,003,763 Instagram views between 31 May and 7 July, clubs, concerts and private events.") + nav(p, "dj") + f"""
 <main>
 <div class="band invert">
 <section class="phead phead--dj">
-  <p class="label label--accent">Zander Production</p>
+  <p class="label label--accent">DJZander</p>
   <h1 class="phead__title">DJ, MC and the guy filming it</h1>
   <div class="phead__cols">
     <p>I started playing clubs and events in 2020 and it turned into a real job, so I registered it with the <a href="https://www.kvk.nl/bestellen/#/99829398000064874893?origin=search" target="_blank" rel="noopener">KVK</a>. I do all of it: bookings and client contact, the rider, the set, playing and MC-ing, and then filming and editing the recap and promo content.</p>
@@ -567,7 +565,7 @@ def page_dj():
   </div>
 </section>
 """ + contact(p, "Book<br>a show",
-              "Clubs, concerts, private events and dinner parties. Send me the date, the place and the vibe, and I'll get back to you fast.") + foot(p)
+              "Clubs, concerts, private events and dinner parties. Send the date, the place and the vibe to my booking email and I'll get back to you fast.", booking=True) + foot(p)
 
 
 REDIRECT = """<!DOCTYPE html>
