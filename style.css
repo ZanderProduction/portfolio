@@ -304,7 +304,6 @@ ul,ol{list-style:none}
   .mmenu__links a{display:flex;align-items:flex-start;gap:12px;text-decoration:none;font-weight:900;font-stretch:62%;text-transform:uppercase;font-size:clamp(38px,11vw,92px);line-height:.9;letter-spacing:-.01em;padding:10px 0;border-bottom:1px solid var(--line);opacity:0;transform:translateY(30px);transition:opacity .45s ease,transform .45s cubic-bezier(.2,.7,.2,1),color .2s}
   .mmenu__links a span{font-size:15px;font-weight:800;font-stretch:80%;color:var(--accent);padding-top:6px;letter-spacing:0}
   .mmenu__links a:active,.mmenu__links a:hover{color:var(--accent)}
-  .mmenu__hot{color:var(--accent)}
   .menu-open .mmenu__links a{opacity:1;transform:none}
   .menu-open .mmenu__links a:nth-child(1){transition-delay:.18s}
   .menu-open .mmenu__links a:nth-child(2){transition-delay:.24s}
