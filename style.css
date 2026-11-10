@@ -272,7 +272,7 @@ ul,ol{list-style:none}
 
 /* alternating light bands (Work, About) */
 .band{background:var(--paper);color:var(--ink)}
-.invert{--paper:#eee9df;--paper-2:#e2dccf;--ink:#0f1f1a;--muted:#4f5c55;--line:rgba(15,31,26,.16);--black:#07110e}
+.invert{--paper:#eee9df;--paper-2:#e2dccf;--ink:#0f1f1a;--muted:#4f5c55;--line:rgba(15,31,26,.16);--black:#07110e;--dark:#e6e0d3;--dark-text:#0f1f1a;--dark-muted:#4f5c55;--dark-line:rgba(15,31,26,.16)}
 .invert .logos img{filter:brightness(0) saturate(100%);opacity:.85}
 .invert .logo-lockup span{color:var(--ink)}
 .invert .ep-link .yt__play{background:var(--ink);color:var(--paper)}
