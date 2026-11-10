@@ -461,3 +461,14 @@ html{overflow-x:clip}
 .cband__more{font-weight:700;text-decoration:none}
 .contact--page{min-height:calc(100vh - 120px)}
 .hero__bottom--solo{grid-template-columns:1fr}.hero__bottom--solo .hero__intro{max-width:46ch}
+
+/* Bulgarian Society page */
+.bsl{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:clamp(20px,3vw,40px);align-items:start}
+.bsl__reel{position:relative;display:block;aspect-ratio:548/858;overflow:hidden;background:var(--paper-2)}
+.bsl__reel img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.bsl__reel:hover img{transform:scale(1.03)}
+.bsl__side{display:flex;flex-direction:column;gap:clamp(16px,2vw,24px)}
+.bsl__grid{display:block;border:1px solid var(--line);overflow:hidden}
+.bsl__grid img{width:100%;height:auto}
+.bubbles--one{grid-template-columns:1fr}
+@media (max-width:760px){.bsl{grid-template-columns:1fr}.bsl__reel{max-width:420px}}

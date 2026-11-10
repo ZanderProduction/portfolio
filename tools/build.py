@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "44"  # bump to make browsers fetch fresh css/js
+V = "45"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -196,6 +196,15 @@ CASES = [
          tag="Vlog series / YouTube",
          line="My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.",
          role="Filming and editing, every episode"),
+    dict(slug="vsa-music-videos", title="VSA music videos", video="sZbNW_AUgt0", thumb=yt_thumb("sZbNW_AUgt0"),
+         tag="Music videos / 3 videos / Bulgarian artist VSA", home=False,
+         line="My first music video project: a summer in the studio with a friend, three videos and no proper equipment.",
+         role="Shot on an iPhone 14 Pro and an old Lumix"),
+    dict(slug="bulgarian-society-leeuwarden", title="Bulgarian Society Leeuwarden", home=False,
+         thumb=CDN + "00159df6-464c-42c9-b506-bd160dd2d3d9_rw_1920.png?h=3564799de40e4e31deed437d846df51f",
+         tag="Social media / posters and reels / 2023 - 2025",
+         line="I co-founded the society and led its PR: the look, the Instagram, and most of the posters and reels until June 2025.",
+         role="Co-founder and Head of PR, one reel at 376K views"),
 ]
 ZANDER = dict(title="DJZander", thumb=PHOTO_CLUB,
               tag="Social content / DJ and MC business",
@@ -214,8 +223,8 @@ def card(p, x, href, more="See the project →"):
     </a>"""
 
 
-def all_cards(p):
-    c = [card(p, x, f"{p}work/{x['slug']}/") for x in CASES]
+def all_cards(p, home=False):
+    c = [card(p, x, f"{p}work/{x['slug']}/") for x in CASES if not home or x.get("home", True)]
     return "\n".join(c)
 
 
@@ -297,7 +306,7 @@ def page_home():
     <a class="section__more" href="work/">All work →</a>
   </div>
   <div class="cards">
-{all_cards(p)}
+{all_cards(p, home=True)}
   </div>
 {logos(p)}
 </section>
@@ -318,23 +327,25 @@ def page_work():
 """ + contact_band(p) + foot(p)
 
 
-def case_page(x, title, desc, intro, credits, facts, extra="", caption=None):
+def case_page(x, title, desc, intro, credits, facts, extra="", caption=None, media=None, credits_label="Credits"):
     p = "../../"
-    cr = "".join(f"<div><dt>{a}</dt><dd>{b}</dd></div>" for a, b in credits)
-    fa = "".join(f"<div><dt>{a}</dt><dd>{b}</dd></div>" for a, b in facts)
+    dl = lambda rows: "".join(f"<div><dt>{a}</dt><dd>{b}</dd></div>" for a, b in rows)
+    if media is None:
+        media = f"""<div class="yt yt--big" data-id="{x['video']}" data-title="{x['title']}"></div>
+  <p class="case__caption">{caption or "The trailer, cut by me."}</p>"""
+    cols = f"""
+    <div>
+      <p class="label">{credits_label}</p>
+      <dl class="credits">{dl(credits)}</dl>
+    </div>""" if credits else ""
     return head(p, title, desc) + nav(p, "work") + case_head(p, x, intro) + f"""
 <section class="section section--case">
-  <div class="yt yt--big" data-id="{x['video']}" data-title="{x['title']}"></div>
-  <p class="case__caption">{caption or "The trailer, cut by me."}</p>
+  {media}
 
-  <div class="case">
-    <div>
-      <p class="label">Credits</p>
-      <dl class="credits">{cr}</dl>
-    </div>
+  <div class="case">{cols}
     <div>
       <p class="label">The project</p>
-      <dl class="credits">{fa}</dl>
+      <dl class="credits">{dl(facts)}</dl>
     </div>
   </div>
   {extra}
@@ -383,6 +394,41 @@ def page_wwz():
     <div class="slider" data-list="VLOGS"></div>
   </div>''',
         caption="Week with Zander #5-6: gigs, travel and training.")
+
+
+def page_vsa():
+    return case_page(CASES[4], "VSA music videos - Alexandar Ivanov",
+        "Three music videos for the Bulgarian artist VSA, shot on an iPhone 14 Pro and an old Lumix camera.",
+        "One summer I was in the studio with a friend of mine, the Bulgarian artist VSA, and we decided to film some music videos. It was my first music video project and we didn't have proper equipment: everything was filmed on an iPhone 14 Pro and an old Lumix camera. But the passion was there.",
+        [],
+        [("Artist", "VSA / BlackSheep"), ("Videos", "3, released in 2023"), ("Shot on", "iPhone 14 Pro, old Lumix"), ("First", "music video project")],
+        '<div class="episodes" data-list="VSA_VIDEOS" data-label="The other two videos"></div>',
+        caption="STANDART, the official video.")
+
+
+def page_bsl():
+    reel = "https://www.instagram.com/reel/DJuIaMXtGJP/"
+    media = f"""<div class="bsl">
+    <a class="bsl__reel" href="{reel}" target="_blank" rel="noopener">
+      <img width="548" height="858" src="{CDN}6f2e1a4a-fead-4d72-bc78-ea65194efa81_rw_600.png?h=26db4e9d4bf6024d3673bb274273542a" alt="Reel: Who is the imposter? (Balkan edition), 376K views">
+      <span class="yt__play">Watch the reel ↗</span>
+    </a>
+    <div class="bsl__side">
+      <div class="bubbles bubbles--one">
+        <div class="bubble bubble--hot"><b data-count="376" data-suffix="K">376K</b><span>views on one reel I made</span></div>
+      </div>
+      <a class="bsl__grid" href="https://www.instagram.com/bulgariansociety.lwd/" target="_blank" rel="noopener">
+        <img width="1920" height="1615" loading="lazy" src="{CASES[5]['thumb']}" alt="The society's Instagram profile">
+      </a>
+      <p class="links"><a href="https://www.instagram.com/bulgariansociety.lwd/" target="_blank" rel="noopener">@bulgariansociety.lwd on Instagram ↗</a></p>
+    </div>
+  </div>"""
+    return case_page(CASES[5], "Bulgarian Society Leeuwarden - Alexandar Ivanov",
+        "Co-founder and Head of PR of the Bulgarian Society Leeuwarden, 2023 - 2025. Posters, reels and the society's Instagram.",
+        "I co-founded the Bulgarian Society Leeuwarden and led its PR team, shaping the society's look and public profile. I grew the Instagram from the very beginning in 2023 and made most of the posters and reels until I left the society in June 2025.",
+        [("Role", "co-founder, Head of PR"), ("Instagram", "grown from zero"), ("Content", "most posters and reels"), ("Events", "DJ, venues and clubs")],
+        [("Years", "2023 - June 2025"), ("Team", "weekly meetings"), ("Members", "interviews and selection"), ("Best reel", "376K views")],
+        media=media, credits_label="What I did")
 
 
 def page_about():
@@ -602,6 +648,8 @@ if __name__ == "__main__":
     write("work/are-you-mental/index.html", page_aym())
     write("work/week-with-zander/index.html", page_wwz())
     write("work/the-mix-up/index.html", page_mixup())
+    write("work/vsa-music-videos/index.html", page_vsa())
+    write("work/bulgarian-society-leeuwarden/index.html", page_bsl())
     write("work/social-content/index.html", REDIRECT.format(to="../../dj/#content"))
     write("dj/index.html", page_dj())
     write("about/index.html", page_about())

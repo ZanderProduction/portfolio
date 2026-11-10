@@ -16,6 +16,10 @@ const WITP_EPISODES = [
   ["VDmNOxgUtoM", "Episode 2", "12 min / camera and edit by me"],
   ["ovS9lSbq-fQ", "Episode 3", "18 min / camera and edit by me"],
 ];
+const VSA_VIDEOS = [
+  ["Ei1IpoHXosM", "ПАЛИМ (Palim)", "Official video, July 2023"],
+  ["1DKxT73_uu0", "ТРЕТОТО ОКО (Tretoto Oko)", "Official video, September 2023"],
+];
 const AYM_EPISODES = [
   ["a1_u9RdP_Gw", "Episode 1", "16 min / opens on YouTube", "link"],
   ["DbPrGk1ccdg", "Episode 2: Spice Challenge", "24 min / full episode"],
@@ -116,11 +120,11 @@ if (SHOWREEL) {
 }
 
 // Episodes under projects
-const epLists = { WITP_EPISODES, AYM_EPISODES };
+const epLists = { WITP_EPISODES, AYM_EPISODES, VSA_VIDEOS };
 document.querySelectorAll(".episodes").forEach((box) => {
   const list = epLists[box.dataset.list] || [];
   if (!list.length) return;
-  box.innerHTML = `<p class="episodes__label">Full episodes</p>` + list.map(([id, title, meta, mode]) => {
+  box.innerHTML = `<p class="episodes__label">${esc(box.dataset.label || "Full episodes")}</p>` + list.map(([id, title, meta, mode]) => {
     const card = mode === "link"
       ? `<a class="ep-link" href="https://www.youtube.com/watch?v=${esc(id)}" target="_blank" rel="noopener"><div class="yt yt--static" data-id="${esc(id)}" data-label="Watch on YouTube ↗"></div>`
       : `<div><div class="yt" data-id="${esc(id)}" data-title="${esc(title)}"></div>`;
