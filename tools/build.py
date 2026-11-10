@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "43"  # bump to make browsers fetch fresh css/js
+V = "44"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -188,14 +188,14 @@ CASES = [
          tag="Challenge series / 2 episodes + trailer",
          line="Two guys, a list of challenges, no polish on purpose. The tone of the show was made in the edit.",
          role="Main camera and editor on both episodes, trailer"),
-    dict(slug="week-with-zander", title="Week with Zander", video="G71JpTXkimw", thumb=yt_thumb("G71JpTXkimw"),
-         tag="Vlog series / YouTube",
-         line="My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.",
-         role="Filming and editing, every episode"),
     dict(slug="the-mix-up", title="The Mix Up!", video="7jMX52GM8R4", thumb=yt_thumb("7jMX52GM8R4"),
          tag="Short film / 24-hour challenge",
          line="One rule: start to finish in a day. Planned, shot and edited before the deadline.",
          role="Planning, camera and edit, solo"),
+    dict(slug="week-with-zander", title="Week with Zander", video="hCSl4K2XNrE", thumb=yt_thumb("hCSl4K2XNrE"),
+         tag="Vlog series / YouTube",
+         line="My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.",
+         role="Filming and editing, every episode"),
 ]
 ZANDER = dict(title="DJZander", thumb=PHOTO_CLUB,
               tag="Social content / DJ and MC business",
@@ -370,7 +370,7 @@ def page_mixup():
 
 
 def page_wwz():
-    return case_page(CASES[2], "Week with Zander - Alexandar Ivanov",
+    return case_page(CASES[3], "Week with Zander - Alexandar Ivanov",
         "Vlog series about gigs, travel and training. Filmed and edited by Alexandar Ivanov.",
         "My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.",
         [("Idea", "my own series"), ("Camera", "me"), ("Editor", "every episode")],
@@ -382,7 +382,7 @@ def page_wwz():
     </div>
     <div class="slider" data-list="VLOGS"></div>
   </div>''',
-        caption="Episode 1: DJing a silent disco.")
+        caption="Week with Zander #5-6: gigs, travel and training.")
 
 
 def page_about():
