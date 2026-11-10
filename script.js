@@ -213,7 +213,7 @@ const navLock = { id: undefined };
     const target = document.getElementById(location.hash.slice(1));
     let userScrolled = false;
     const mark = () => { userScrolled = true; };
-    ["wheel", "touchmove", "keydown"].forEach((e) => window.addEventListener(e, mark, { once: true, passive: true }));
+    ["wheel", "touchmove", "keydown", "pointerdown"].forEach((e) => window.addEventListener(e, mark, { once: true, passive: true }));
     const jump = () => { if (!userScrolled) target.scrollIntoView({ behavior: "instant", block: "start" }); };
     requestAnimationFrame(jump);
     window.addEventListener("load", () => setTimeout(jump, 50));
@@ -221,43 +221,46 @@ const navLock = { id: undefined };
   update();
 })();
 
-// Menu clicks (sections and Home): one scroll at a time. A new click cancels everything
-// left over from the previous one, so fast clicking can't pull the page back to an older target.
+// Menu clicks (sections and Home): our own scroll animation instead of the browser's.
+// A new click takes over the running animation from where the page is right now, so there is
+// only ever one movement and nothing fires later to pull the page somewhere else.
 (() => {
   const navH = () => (document.querySelector(".nav")?.offsetHeight || 64);
-  let timers = [], onEnd = null, job = 0;
-  const cancel = () => {
-    timers.forEach(clearTimeout); timers = [];
-    if (onEnd) { window.removeEventListener("scrollend", onEnd); onEnd = null; }
-  };
-  const release = () => { cancel(); navLock.id = undefined; navLock.refresh && navLock.refresh(); };
+  const maxY = () => document.documentElement.scrollHeight - window.innerHeight;
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let raf = 0, job = 0;
+  const jumpTo = (y) => window.scrollTo({ top: y, behavior: "instant" });
+  const stop = () => { cancelAnimationFrame(raf); raf = 0; };
+  const release = () => { stop(); navLock.id = undefined; navLock.refresh && navLock.refresh(); };
   // the visitor scrolling by hand takes over straight away
   ["wheel", "touchstart", "keydown"].forEach((ev) =>
     window.addEventListener(ev, () => { if (navLock.id !== undefined) release(); }, { passive: true }));
 
   const goTo = (id) => {
-    cancel();
+    stop();
     const my = ++job;
     const el = id ? document.getElementById(id) : null;
-    const target = () => (el ? Math.max(0, el.getBoundingClientRect().top + window.scrollY - navH()) : 0);
+    // worked out again on every frame, so images loading above the target can't make it miss
+    const target = () => Math.min(maxY(), Math.max(0, el ? el.getBoundingClientRect().top + window.scrollY - navH() : 0));
     navLock.id = id;                       // null = Home
     navLock.refresh && navLock.refresh();  // highlight the clicked link right away
-    const scroll = () => { if (my === job) window.scrollTo({ top: target(), behavior: "smooth" }); };
-    const settle = () => {
+    const from = window.scrollY;
+    const dist = Math.abs(target() - from);
+    const dur = reduce ? 0 : Math.min(1000, Math.max(450, dist * 0.12));
+    let t0 = null;
+    const frame = (now) => {
       if (my !== job) return;
-      const off = Math.abs(window.scrollY - target());
-      const maxY = document.documentElement.scrollHeight - window.innerHeight;
-      if (off > 3 && !(window.scrollY >= maxY - 2 && target() >= maxY)) scroll();
+      if (t0 === null) t0 = now;
+      const p = dur ? Math.min(1, (now - t0) / dur) : 1;
+      jumpTo(from + (target() - from) * ease(p));
+      if (p < 1) { raf = requestAnimationFrame(frame); return; }
+      raf = 0;
+      // stay on the clicked link a moment, then let the scroll-spy take over again
+      setTimeout(() => { if (my === job) release(); }, 150);
     };
-    // wait a moment so the phone menu has released the page before scrolling
-    timers.push(setTimeout(scroll, 40));
-    if ("onscrollend" in window) {
-      onEnd = () => { settle(); };
-      timers.push(setTimeout(() => { if (my === job) window.addEventListener("scrollend", onEnd); }, 60));
-    }
-    timers.push(setTimeout(settle, 1100));
-    timers.push(setTimeout(settle, 2000));
-    timers.push(setTimeout(() => { if (my === job) release(); }, 2600));
+    // short wait so the phone menu has released the page before scrolling
+    setTimeout(() => { if (my === job) raf = requestAnimationFrame(frame); }, 40);
   };
 
   document.querySelectorAll('a[href^="#"]').forEach((a) => {
