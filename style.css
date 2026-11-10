@@ -148,7 +148,7 @@ ul,ol{list-style:none}
 .insta__text > p:not(.tag):not(.links){color:var(--muted);margin-bottom:12px}
 .insta__text b{color:var(--ink)}
 .insta__shots{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.insta__shots img{border:1px solid var(--ink);width:100%}
+.insta__shots img{border:1px solid var(--ink);width:100%;height:auto;aspect-ratio:1179/2556}
 .reels{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .reels:empty{display:none}
 .reels .instagram-media{margin:0!important;min-width:0!important;width:100%!important}

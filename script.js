@@ -213,6 +213,31 @@ document.querySelectorAll(".episodes").forEach((box) => {
   update();
 })();
 
+// Menu clicks: scroll to the section, then correct if anything above it changed size meanwhile
+(() => {
+  const navH = () => (document.querySelector(".nav")?.offsetHeight || 64);
+  const topOf = (el) => el.getBoundingClientRect().top + window.scrollY - navH();
+  document.querySelectorAll('a[href^="#"]').forEach((a) => {
+    const id = a.getAttribute("href").slice(1);
+    const el = id && id !== "top" ? document.getElementById(id) : null;
+    if (!el) return;
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const go = () => {
+        window.scrollTo({ top: topOf(el), behavior: "smooth" });
+        const settle = () => {
+          const off = el.getBoundingClientRect().top - navH();
+          if (Math.abs(off) > 3) window.scrollTo({ top: topOf(el), behavior: "smooth" });
+        };
+        if ("onscrollend" in window) window.addEventListener("scrollend", settle, { once: true });
+        setTimeout(settle, 1100);
+      };
+      // wait one frame so the phone menu has released the page before scrolling
+      requestAnimationFrame(() => requestAnimationFrame(go));
+    });
+  });
+})();
+
 // Build sliders
 document.querySelectorAll(".slider").forEach((slider) => {
   const name = slider.dataset.list;
