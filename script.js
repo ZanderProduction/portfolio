@@ -185,9 +185,11 @@ document.querySelectorAll(".episodes").forEach((box) => {
 // While a menu click is scrolling, the highlight and address show where you're going, not every section passed
 const navLock = { id: undefined };
 
-// Address bar follows the section you're in (#work, #music, #about, #contact)
+// Home page: address bar follows the section you're in (#work, #about, #contact)
+if (location.hash === "#music") location.replace("dj/");
 (() => {
-  const ids = ["work", "music", "about", "contact"];
+  if (document.body.dataset.page !== "home") return;
+  const ids = ["work", "about", "contact"];
   const sections = ids.map((id) => document.getElementById(id)).filter(Boolean);
   const navLinks = [...document.querySelectorAll('.nav__links a, .mmenu__links a')];
   let current = null, ticking = false;
@@ -347,7 +349,7 @@ document.querySelectorAll(".yt").forEach((el) => {
 });
 
 // Instagram reels
-if (REELS.length) {
+if (REELS.length && document.getElementById("reels")) {
   document.getElementById("reels").innerHTML = REELS.map((u) =>
     `<blockquote class="instagram-media" data-instgrm-permalink="${esc(u)}" data-instgrm-version="14"></blockquote>`
   ).join("");
@@ -362,32 +364,50 @@ fetch("cv.pdf", { method: "HEAD" })
   .then((r) => { if (!r.ok || (r.headers.get("content-type") || "").includes("text/html")) throw 0; })
   .catch(() => document.querySelectorAll(".cv-link").forEach((n) => (n.style.display = "none")));
 
-// Count-up for the Instagram numbers
+// Count-up for the Instagram numbers. Plays again every time they scroll back into view.
 const counters = document.querySelectorAll("[data-count]");
 const runCount = (el) => {
   const end = Number(el.dataset.count), suffix = el.dataset.suffix || "", t0 = performance.now(), dur = 1400;
+  const run = (el._run = (el._run || 0) + 1);
   const step = (t) => {
+    if (run !== el._run) return;
     const p = Math.min(1, (t - t0) / dur), v = Math.round(end * (1 - Math.pow(1 - p, 3)));
     el.textContent = v.toLocaleString("en-US") + suffix;
     if (p < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
 };
-if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+const resetCount = (el) => {
+  el._run = (el._run || 0) + 1;
+  el.textContent = "0" + (el.dataset.suffix || "");
+  const bar = el.closest(".bar");
+  if (bar) {
+    // empty the bar instantly (no reverse animation) so it fills up fresh next time
+    bar.classList.add("no-anim");
+    bar.classList.remove("is-filled");
+    void bar.offsetWidth;
+    bar.classList.remove("no-anim");
+  }
+};
+if (counters.length && "IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   document.querySelectorAll(".bubble--hot").forEach((b) => b.classList.add("bar"));
   const co = new IntersectionObserver((entries) => entries.forEach((en) => {
-    if (en.isIntersecting) {
-      runCount(en.target);
-      const bar = en.target.closest(".bar");
+    const el = en.target;
+    if (en.intersectionRatio >= 0.6 && !el._shown) {
+      el._shown = true;
+      runCount(el);
+      const bar = el.closest(".bar");
       if (bar) bar.classList.add("is-filled");
-      co.unobserve(en.target);
+    } else if (!en.isIntersecting && el._shown) {
+      el._shown = false;
+      resetCount(el);
     }
-  }), { threshold: 0.6 });
+  }), { threshold: [0, 0.6] });
   counters.forEach((c) => co.observe(c));
 }
 
 // Fade in on scroll
-const fadeEls = document.querySelectorAll(".project, .row, .insta, .partners, .highlights, .photos, .about, .cvgrid, .services");
+const fadeEls = document.querySelectorAll(".card, .row:not(.row--first), .insta, .partners, .highlights, .photos, .about, .case, .yt--big");
 if ("IntersectionObserver" in window) {
   fadeEls.forEach((el) => el.classList.add("fade"));
   const io = new IntersectionObserver((entries) => entries.forEach((en) => {
@@ -396,4 +416,5 @@ if ("IntersectionObserver" in window) {
   fadeEls.forEach((el) => io.observe(el));
 }
 
-document.getElementById("year").textContent = new Date().getFullYear();
+const yearEl = document.getElementById("year");
+if (yearEl) yearEl.textContent = new Date().getFullYear();

@@ -344,3 +344,67 @@ html{overflow-x:clip}
 .bubble--hot.bar.is-filled b,.bubble--hot.bar.is-filled span{color:var(--black)}
 @media (max-width:560px){.bubble--hot.bar b{transition-delay:.45s}}
 .about__text p:last-child{margin-bottom:0}
+
+/* ===================== multi-page redesign ===================== */
+
+/* project cards on the home page */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(34px,4vw,56px) clamp(20px,3vw,40px)}
+.card{display:flex;flex-direction:column;text-decoration:none;color:inherit;border-top:1px solid var(--ink);padding-top:18px}
+.card__img{aspect-ratio:16/9;overflow:hidden;background:var(--paper-2);margin-bottom:18px}
+.card__img img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.card:hover .card__img img{transform:scale(1.04)}
+.card h3{font-weight:900;font-stretch:68%;text-transform:uppercase;font-size:clamp(34px,3.6vw,52px);line-height:.88;margin-bottom:12px;transition:color .25s}
+.card:hover h3{color:var(--accent)}
+.card__line{color:var(--muted);max-width:52ch}
+.card__role{font-weight:700;margin-top:10px}
+.card__more{margin-top:14px;font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:var(--accent);text-underline-offset:5px;align-self:flex-start}
+@media (max-width:760px){.cards{grid-template-columns:1fr}}
+
+/* big one-line link strip (DJ line, next project) */
+.strip{display:flex;flex-direction:column;gap:8px;max-width:var(--max);margin:0 auto;padding:clamp(34px,5vw,64px) var(--pad);text-decoration:none;color:inherit}
+.strip__title{font-weight:900;font-stretch:66%;text-transform:uppercase;font-size:clamp(34px,5.6vw,84px);line-height:.88;letter-spacing:-.01em;transition:color .25s}
+.strip__title i{font-style:normal;color:var(--accent);display:inline-block;transition:transform .3s}
+.strip:hover .strip__title{color:var(--accent)}
+.strip:hover .strip__title i{transform:translateX(10px)}
+
+/* page head on project and DJ pages */
+.phead{max-width:var(--max);margin:0 auto;padding:clamp(28px,5vw,56px) var(--pad) clamp(40px,6vw,72px)}
+.phead__back{display:inline-block;font-weight:700;text-decoration:none;margin-bottom:clamp(24px,4vw,44px)}
+.phead__back:hover{color:var(--accent)}
+.phead__title{font-weight:900;font-stretch:62%;text-transform:uppercase;font-size:clamp(52px,11vw,170px);line-height:.82;letter-spacing:-.015em;margin:4px 0 clamp(20px,3vw,32px)}
+.phead__intro{font-size:clamp(19px,2vw,25px);line-height:1.4;font-weight:450;max-width:44ch}
+.phead--dj{padding-top:clamp(40px,6vw,72px)}
+.phead--dj .phead__title{margin-top:10px}
+.phead__cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);color:var(--muted);font-size:18px}
+.phead__cols b{color:var(--ink)}
+.phead__cols a{text-decoration:underline;text-underline-offset:3px}
+@media (max-width:760px){.phead__cols{grid-template-columns:1fr}}
+
+/* project page body */
+.section--case{padding-top:clamp(40px,6vw,72px)}
+.section--tight{padding-top:clamp(48px,7vw,90px);padding-bottom:clamp(48px,7vw,90px)}
+.row--first{padding-top:0}
+.yt--big .yt__play{font-size:17px;padding:16px 22px 16px 20px}
+.case__caption{font-size:14px;color:var(--muted);margin-top:10px}
+.case{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);margin-top:clamp(40px,6vw,72px);padding-top:28px;border-top:1px solid var(--ink)}
+.case .credits{margin-top:10px}
+.section--case .episodes{margin-top:clamp(40px,6vw,64px)}
+@media (max-width:760px){.case{grid-template-columns:1fr}}
+@media (max-width:420px){.credits dd{white-space:normal;text-align:right}}
+
+/* social page: numbers on top, then text + screenshots */
+.insta--case{margin-top:0;padding-top:0;border-top:0;grid-template-columns:1fr 1fr}
+.insta--case .bubbles{margin-bottom:clamp(20px,3vw,32px)}
+.insta--case .insta__text{position:sticky;top:96px}
+.insta--case .insta__text p:not(.label):not(.links){color:var(--muted);margin-top:10px;font-size:18px}
+@media (max-width:860px){.insta--case{grid-template-columns:1fr}.insta--case .insta__text{position:static}}
+
+/* the views bar can be emptied without animating backwards */
+.bubble--hot.bar.no-anim,.bubble--hot.bar.no-anim b,.bubble--hot.bar.no-anim span{transition:none}
+
+/* back to the top, always in the bottom-right corner */
+.totop{position:fixed;right:clamp(14px,2.4vw,28px);bottom:calc(clamp(14px,2.4vw,28px) + env(safe-area-inset-bottom));z-index:50;width:48px;height:48px;display:grid;place-items:center;background:var(--black);color:#eee9df;border:1.5px solid rgba(238,233,223,.35);text-decoration:none;font-weight:800;font-size:22px;line-height:1;transition:background .2s,color .2s,border-color .2s,transform .2s}
+.totop:hover{background:var(--accent);border-color:var(--accent);color:var(--black);transform:translateY(-2px)}
+.menu-open .totop{opacity:0;pointer-events:none}
+@media (max-width:760px){.totop{width:44px;height:44px;font-size:20px}}
+.footer{padding-right:calc(var(--pad) + 60px)}
