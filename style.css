@@ -269,3 +269,13 @@ ul,ol{list-style:none}
 .hero-loop__sound::before{content:"";width:18px;height:18px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z'/%3E%3C/svg%3E") center/contain no-repeat}
 .hero-loop__sound:hover{padding-right:28px}
 .hero-loop.is-sound .hero-loop__sound{background:var(--ink)}
+
+/* alternating light bands (Work, About) */
+.band{background:var(--paper);color:var(--ink)}
+.invert{--paper:#eee9df;--paper-2:#e2dccf;--ink:#0f1f1a;--muted:#4f5c55;--line:rgba(15,31,26,.16);--black:#07110e}
+.invert .logos img{filter:brightness(0) saturate(100%);opacity:.85}
+.invert .logo-lockup span{color:var(--ink)}
+.invert .ep-link .yt__play{background:var(--ink);color:var(--paper)}
+.invert .insta__shots img{border-color:var(--line)}
+.invert .bubble{border-color:var(--line)}
+.invert .credits div::before{opacity:.45}
