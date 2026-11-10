@@ -199,7 +199,7 @@ document.querySelectorAll(".episodes").forEach((box) => {
     current = active;
     const url = active ? "#" + active : location.pathname + location.search;
     history.replaceState(null, "", url);
-    navLinks.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === "#" + active));
+    navLinks.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === (active ? "#" + active : "#top")));
   };
   window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
 
