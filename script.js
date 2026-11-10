@@ -163,6 +163,24 @@ document.querySelectorAll(".episodes").forEach((box) => {
   });
 })();
 
+// Phone menu
+(() => {
+  const btn = document.querySelector(".nav__toggle");
+  const menu = document.getElementById("mobile-menu");
+  if (!btn || !menu) return;
+  const label = btn.querySelector(".nav__toggle-text");
+  const set = (open) => {
+    document.body.classList.toggle("menu-open", open);
+    btn.setAttribute("aria-expanded", String(open));
+    menu.setAttribute("aria-hidden", String(!open));
+    label.textContent = open ? "Close" : "Menu";
+  };
+  btn.addEventListener("click", () => set(!document.body.classList.contains("menu-open")));
+  menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => set(false)));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
+  window.addEventListener("resize", () => { if (window.innerWidth > 760) set(false); });
+})();
+
 // Build sliders
 document.querySelectorAll(".slider").forEach((slider) => {
   const name = slider.dataset.list;
