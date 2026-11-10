@@ -59,6 +59,8 @@ const REMIXES = [
 
 // Posters: add more by pasting image links (or "images/your-file.jpg") to this list.
 const CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/";
+// site root (works from every page, e.g. /dj/ or /work/x/), so "images/..." always points to the right folder
+const ROOT = new URL(".", document.currentScript.src).href;
 const POSTERS = [
   "images/poster-bnr-zander-artist-card.jpg",
   "images/poster-emanuela-villa-thalia.jpg",
@@ -178,49 +180,27 @@ document.querySelectorAll(".episodes").forEach((box) => {
   };
   btn.addEventListener("click", () => set(!document.body.classList.contains("menu-open")));
   menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => set(false)));
+  // "+" next to Work opens the list of projects
+  menu.querySelectorAll(".mmenu__more").forEach((b) => b.addEventListener("click", () => {
+    const g = b.closest(".mmenu__group");
+    const open = !g.classList.contains("is-open");
+    g.classList.toggle("is-open", open);
+    b.setAttribute("aria-expanded", String(open));
+    b.setAttribute("aria-label", open ? "Hide projects" : "Show projects");
+    b.textContent = open ? "−" : "+";
+  }));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
   window.addEventListener("resize", () => { if (window.innerWidth > 760) set(false); });
 })();
 
-// While a menu click is scrolling, the highlight and address show where you're going, not every section passed
+// Tracks a running in-page scroll (back to top, "Book a show")
 const navLock = { id: undefined };
 
-// Home page: address bar follows the section you're in (#work, #about, #contact)
-if (location.hash === "#music") location.replace("dj/");
+// Old one-page links (zanderproduction.nl/#about etc.) go to the new pages
 (() => {
   if (document.body.dataset.page !== "home") return;
-  const ids = ["work", "about", "contact"];
-  const sections = ids.map((id) => document.getElementById(id)).filter(Boolean);
-  const navLinks = [...document.querySelectorAll('.nav__links a, .mmenu__links a')];
-  let current = null, ticking = false;
-  const update = () => {
-    ticking = false;
-    const line = window.innerHeight * 0.35;
-    let active = null;
-    for (const s of sections) if (s.getBoundingClientRect().top <= line) active = s.id;
-    const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4;
-    if (atBottom && sections.length) active = sections[sections.length - 1].id;
-    if (navLock.id !== undefined) active = navLock.id;
-    if (active === current) return;
-    current = active;
-    const url = active ? "#" + active : location.pathname + location.search;
-    history.replaceState(null, "", url);
-    navLinks.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === (active ? "#" + active : "#top")));
-  };
-  window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  navLock.refresh = update;
-
-  // On refresh with #section: land on it again once images and sliders have loaded
-  if (location.hash && ids.includes(location.hash.slice(1))) {
-    const target = document.getElementById(location.hash.slice(1));
-    let userScrolled = false;
-    const mark = () => { userScrolled = true; };
-    ["wheel", "touchmove", "keydown", "pointerdown"].forEach((e) => window.addEventListener(e, mark, { once: true, passive: true }));
-    const jump = () => { if (!userScrolled) target.scrollIntoView({ behavior: "instant", block: "start" }); };
-    requestAnimationFrame(jump);
-    window.addEventListener("load", () => setTimeout(jump, 50));
-  }
-  update();
+  const map = { "#music": "dj/", "#content": "dj/#content", "#about": "about/", "#contact": "contact/" };
+  if (map[location.hash]) location.replace(map[location.hash]);
 })();
 
 // Menu clicks (sections and Home): our own scroll animation instead of the browser's.
@@ -234,7 +214,7 @@ if (location.hash === "#music") location.replace("dj/");
   let raf = 0, job = 0;
   const jumpTo = (y) => window.scrollTo({ top: y, behavior: "instant" });
   const stop = () => { cancelAnimationFrame(raf); raf = 0; };
-  const release = () => { stop(); navLock.id = undefined; navLock.refresh && navLock.refresh(); };
+  const release = () => { stop(); navLock.id = undefined; };
   // the visitor scrolling by hand takes over straight away
   ["wheel", "touchstart", "keydown"].forEach((ev) =>
     window.addEventListener(ev, () => { if (navLock.id !== undefined) release(); }, { passive: true }));
@@ -245,8 +225,7 @@ if (location.hash === "#music") location.replace("dj/");
     const el = id ? document.getElementById(id) : null;
     // worked out again on every frame, so images loading above the target can't make it miss
     const target = () => Math.min(maxY(), Math.max(0, el ? el.getBoundingClientRect().top + window.scrollY - navH() : 0));
-    navLock.id = id;                       // null = Home
-    navLock.refresh && navLock.refresh();  // highlight the clicked link right away
+    navLock.id = id;
     const from = window.scrollY;
     const dist = Math.abs(target() - from);
     const dur = reduce ? 0 : Math.min(1000, Math.max(450, dist * 0.12));
@@ -258,7 +237,6 @@ if (location.hash === "#music") location.replace("dj/");
       jumpTo(from + (target() - from) * ease(p));
       if (p < 1) { raf = requestAnimationFrame(frame); return; }
       raf = 0;
-      // stay on the clicked link a moment, then let the scroll-spy take over again
       setTimeout(() => { if (my === job) release(); }, 150);
     };
     // short wait so the phone menu has released the page before scrolling
@@ -281,7 +259,7 @@ document.querySelectorAll(".slider").forEach((slider) => {
   let slides;
   if (name === "POSTERS") {
     slides = POSTERS.map((p) => {
-      const src = /^https?:|^images\//.test(p) ? p : CDN + p;
+      const src = /^https?:/.test(p) ? p : /^images\//.test(p) ? ROOT + p : CDN + p;
       return `<div class="slide"><img loading="lazy" src="${esc(src)}" alt="DJZander show poster"></div>`;
     });
   } else {
@@ -407,7 +385,7 @@ if (counters.length && "IntersectionObserver" in window && !matchMedia("(prefers
 }
 
 // Fade in on scroll
-const fadeEls = document.querySelectorAll(".card, .row:not(.row--first), .insta, .partners, .highlights, .photos, .about, .case, .yt--big");
+const fadeEls = document.querySelectorAll(".card, .row:not(.row--first), .insta, .partners, .highlights, .photos, .case, .cvgrid");
 if ("IntersectionObserver" in window) {
   fadeEls.forEach((el) => el.classList.add("fade"));
   const io = new IntersectionObserver((entries) => entries.forEach((en) => {

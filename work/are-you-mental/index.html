@@ -10,13 +10,13 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e">
 <meta name="theme-color" content="#0f1f1a">
-<link rel="icon" type="image/png" href="../../images/favicon.png?v=40">
-<link rel="icon" href="../../favicon.ico?v=40" sizes="any">
-<link rel="apple-touch-icon" href="../../images/apple-touch-icon.png?v=40">
+<link rel="icon" type="image/png" href="../../images/favicon.png?v=41">
+<link rel="icon" href="../../favicon.ico?v=41" sizes="any">
+<link rel="apple-touch-icon" href="../../images/apple-touch-icon.png?v=41">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../style.css?v=40">
+<link rel="stylesheet" href="../../style.css?v=41">
 </head>
 <body data-page="work">
 
@@ -24,10 +24,10 @@
   <a href="../../" class="nav__name">Alexandar Ivanov</a>
   <nav class="nav__links" aria-label="Main">
     <a href="../../">Home</a>
-    <a href="../../#work" class="is-active">Work</a>
+    <div class="nav__drop"><a href="../../work/" class="is-active" aria-current="page">Work <i aria-hidden="true">▾</i></a><div class="nav__sub"><a href="../../work/what-is-this-place/">What Is This Place?</a><a href="../../work/are-you-mental/">Are You Mental?</a><a href="../../work/the-mix-up/">The Mix Up!</a></div></div>
     <a href="../../dj/">Zander Production</a>
-    <a href="../../#about">About</a>
-    <a href="#contact">Contact</a>
+    <a href="../../about/">About</a>
+    <a href="../../contact/">Contact</a>
   </nav>
   <a class="nav__cv" href="../../cv.pdf" target="_blank" rel="noopener">CV ↓</a>
   <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">
@@ -40,10 +40,10 @@
 <div class="mmenu" id="mobile-menu" aria-hidden="true">
   <nav class="mmenu__links" aria-label="Menu">
     <a href="../../"><span>00</span>Home</a>
-    <a href="../../#work" class="is-active"><span>01</span>Work</a>
+    <div class="mmenu__group"><div class="mmenu__row"><a href="../../work/" class="is-active" aria-current="page"><span>01</span>Work</a><button class="mmenu__more" type="button" aria-expanded="false" aria-label="Show projects">+</button></div><div class="mmenu__sub"><div class="mmenu__subin"><a href="../../work/what-is-this-place/">What Is This Place?</a><a href="../../work/are-you-mental/">Are You Mental?</a><a href="../../work/the-mix-up/">The Mix Up!</a></div></div></div>
     <a href="../../dj/"><span>02</span>Zander<br>Production</a>
-    <a href="../../#about"><span>03</span>About</a>
-    <a href="#contact"><span>04</span>Contact</a>
+    <a href="../../about/"><span>03</span>About</a>
+    <a href="../../contact/"><span>04</span>Contact</a>
   </nav>
   <div class="mmenu__foot">
     <a href="mailto:alex.ivanov2002@gmail.com">alex.ivanov2002@gmail.com</a>
@@ -59,7 +59,7 @@
 <main>
 <div class="band invert">
 <section class="phead">
-  <a class="phead__back" href="../../#work">← All work</a>
+  <a class="phead__back" href="../../work/">← All work</a>
   <p class="tag">Challenge series / 2 episodes + trailer</p>
   <h1 class="phead__title">Are You Mental?</h1>
   <p class="phead__intro">Two guys, a list of challenges, no polish on purpose. The tone of the show was made in the edit, from a big pile of raw footage to something that feels loose but keeps moving.</p>
@@ -67,55 +67,35 @@
 </div>
 
 <section class="section section--case">
-  <div class="yt yt--big" data-id="rNbgV_s9UQQ" data-title="Are You Mental? - trailer"></div>
+  <div class="yt yt--big" data-id="rNbgV_s9UQQ" data-title="Are You Mental?"></div>
   <p class="case__caption">The trailer, cut by me.</p>
 
   <div class="case">
     <div>
       <p class="label">Credits</p>
-      <dl class="credits">
-        <div><dt>Writing</dt><dd>with the team</dd></div>
-        <div><dt>Main camera</dt><dd>both episodes</dd></div>
-        <div><dt>Editor</dt><dd>both episodes</dd></div>
-        <div><dt>Trailer</dt><dd>cut by me</dd></div>
-      </dl>
+      <dl class="credits"><div><dt>Writing</dt><dd>with the team</dd></div><div><dt>Main camera</dt><dd>both episodes</dd></div><div><dt>Editor</dt><dd>both episodes</dd></div><div><dt>Trailer</dt><dd>cut by me</dd></div></dl>
     </div>
     <div>
       <p class="label">The project</p>
-      <dl class="credits">
-        <div><dt>Format</dt><dd>challenge series</dd></div>
-        <div><dt>Episodes</dt><dd>2 + trailer</dd></div>
-        <div><dt>Style</dt><dd>raw, made in the edit</dd></div>
-      </dl>
+      <dl class="credits"><div><dt>Format</dt><dd>challenge series</dd></div><div><dt>Episodes</dt><dd>2 + trailer</dd></div><div><dt>Style</dt><dd>raw, made in the edit</dd></div></dl>
     </div>
   </div>
-
   <div class="episodes" data-list="AYM_EPISODES"></div>
 </section>
 
 <div class="band invert">
-  <a class="strip" href="../../work/social-content/">
+  <a class="strip" href="../../work/the-mix-up/">
     <span class="label">Next project</span>
-    <span class="strip__title">@djzanderr <i aria-hidden="true">→</i></span>
+    <span class="strip__title">The Mix Up! <i aria-hidden="true">→</i></span>
   </a>
 </div>
 
-<!-- ================= CONTACT ================= -->
-<section class="contact" id="contact">
-  <div class="section">
-    <h2 class="contact__title">Let's work<br>together</h2>
-    <div class="contact__grid contact__grid--single">
-      <div>
-        <p class="contact__lead">Email is the fastest way to reach me. I can travel anywhere in the Netherlands and do an online call any time.</p>
-        <dl class="contact__list">
-          <div><dt>Email</dt><dd><a href="mailto:alex.ivanov2002@gmail.com">alex.ivanov2002@gmail.com</a></dd></div>
-          <div><dt>Phone</dt><dd><a href="tel:+31635636476">+31 6 3563 6476</a></dd></div>
-          <div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/alexandar-ivanov-79539a228/" target="_blank" rel="noopener">Alexandar Ivanov ↗</a></dd></div>
-          <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/djzanderr/" target="_blank" rel="noopener">@djzanderr ↗</a></dd></div>
-          <div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@DDJZANDER" target="_blank" rel="noopener">DJZander ↗</a></dd></div>
-          <div class="cv-link"><dt>CV</dt><dd><a href="../../cv.pdf" target="_blank" rel="noopener">Download PDF ↓</a></dd></div>
-        </dl>
-      </div>
+<section class="cband">
+  <div class="cband__in">
+    <h2 class="cband__title">Let's work together</h2>
+    <div class="cband__links">
+      <a class="cband__mail" href="mailto:alex.ivanov2002@gmail.com">alex.ivanov2002@gmail.com</a>
+      <a class="cband__more" href="../../contact/">All contact details →</a>
     </div>
   </div>
 </section>
@@ -129,6 +109,6 @@
 
 <a href="#top" class="totop" aria-label="Back to the top"><span aria-hidden="true">↑</span></a>
 
-<script src="../../script.js?v=40"></script>
+<script src="../../script.js?v=41"></script>
 </body>
 </html>

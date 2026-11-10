@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "40"  # bump to make browsers fetch fresh css/js
+V = "41"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -46,27 +46,32 @@ def head(p, title, desc):
 
 
 def nav(p, page):
-    home = page == "home"
-    links = [
-        ("Home", "#top" if home else p, "home"),
-        ("Work", "#work" if home else p + "#work", "work"),
-        ("Zander Production", p + "dj/", "dj"),
-        ("About", "#about" if home else p + "#about", "about"),
-        ("Contact", "#contact", "contact"),
-    ]
-    def cls(key):
-        # on the home page the scroll-spy sets the highlight; elsewhere it's fixed per page
-        if home:
-            return ' class="is-active"' if key == "home" else ""
-        return ' class="is-active"' if key == page else ""
-    top = "\n    ".join(f'<a href="{h}"{cls(k)}>{t}</a>' for t, h, k in links)
-    mob = "\n    ".join(
-        f'<a href="{h}"{cls(k)}><span>{i:02d}</span>{t.replace("Zander Production", "Zander<br>Production")}</a>'
-        for i, (t, h, k) in enumerate(links))
+    links = [("Home", p or "./", "home"), ("Work", p + "work/", "work"), ("Zander Production", p + "dj/", "dj"),
+             ("About", p + "about/", "about"), ("Contact", p + "contact/", "contact")]
+    act = lambda k: ' class="is-active" aria-current="page"' if k == page else ""
+    subs = [(x["title"], f'{p}work/{x["slug"]}/') for x in CASES]
+    sub_top = "".join(f'<a href="{h}">{t}</a>' for t, h in subs)
+    sub_mob = "".join(f'<a href="{h}">{t}</a>' for t, h in subs)
+    top = []
+    for t, h, k in links:
+        if k == "work":
+            top.append(f'<div class="nav__drop"><a href="{h}"{act(k)}>Work <i aria-hidden="true">▾</i></a><div class="nav__sub">{sub_top}</div></div>')
+        else:
+            top.append(f'<a href="{h}"{act(k)}>{t}</a>')
+    mob = []
+    for i, (t, h, k) in enumerate(links):
+        label = t.replace("Zander Production", "Zander<br>Production")
+        if k == "work":
+            mob.append(f'<div class="mmenu__group"><div class="mmenu__row"><a href="{h}"{act(k)}><span>{i:02d}</span>{label}</a>'
+                       f'<button class="mmenu__more" type="button" aria-expanded="false" aria-label="Show projects">+</button></div>'
+                       f'<div class="mmenu__sub"><div class="mmenu__subin">{sub_mob}</div></div></div>')
+        else:
+            mob.append(f'<a href="{h}"{act(k)}><span>{i:02d}</span>{label}</a>')
+    top = "\n    ".join(top); mob = "\n    ".join(mob)
     return f"""<body data-page="{page}">
 
 <header class="nav" id="top">
-  <a href="{'#top' if home else p}" class="nav__name">Alexandar Ivanov</a>
+  <a href="{p or './'}" class="nav__name">Alexandar Ivanov</a>
   <nav class="nav__links" aria-label="Main">
     {top}
   </nav>
@@ -120,6 +125,20 @@ def contact(p, title="Let's work<br>together",
 """
 
 
+def contact_band(p):
+    return f"""
+<section class="cband">
+  <div class="cband__in">
+    <h2 class="cband__title">Let's work together</h2>
+    <div class="cband__links">
+      <a class="cband__mail" href="mailto:{EMAIL}">{EMAIL}</a>
+      <a class="cband__more" href="{p}contact/">All contact details →</a>
+    </div>
+  </div>
+</section>
+"""
+
+
 def foot(p):
     return f"""
 </main>
@@ -155,7 +174,7 @@ def logos(p):
 
 # ---------------------------------------------------------------- projects
 
-PROJECTS = [
+CASES = [
     dict(slug="what-is-this-place", title="What Is This Place?", video="ZKMlw-llDe8",
          thumb=yt_thumb("ZKMlw-llDe8"),
          tag="Reality show concept / 3 episodes / MATTERS",
@@ -166,25 +185,19 @@ PROJECTS = [
          tag="Challenge series / 2 episodes + trailer",
          line="Two guys, a list of challenges, no polish on purpose. The tone of the show was made in the edit.",
          role="Main camera and editor on both episodes, trailer"),
-    dict(slug="social-content", title="@djzanderr", thumb=PHOTO_CLUB,
-         tag="Social content / my own channel",
-         line="1,003,763 views between 31 May and 7 July, with no team: film at the show, edit that night, post the next day.",
-         role="Filming, editing and posting"),
-    dict(slug=None, title="The Mix Up!", video="7jMX52GM8R4", thumb=yt_thumb("7jMX52GM8R4"),
+    dict(slug="the-mix-up", title="The Mix Up!", video="7jMX52GM8R4", thumb=yt_thumb("7jMX52GM8R4"),
          tag="Short film / 24-hour challenge",
          line="One rule: start to finish in a day. Planned, shot and edited before the deadline.",
-         role="Planning, camera and edit, solo",
-         url="https://www.youtube.com/watch?v=7jMX52GM8R4"),
+         role="Planning, camera and edit, solo"),
 ]
-CASES = [x for x in PROJECTS if x["slug"]]
+ZANDER = dict(title="Zander Production", thumb=PHOTO_CLUB,
+              tag="Social content / DJ and MC business",
+              line="My own DJ and MC business, and the channel I film and edit for it: 1,003,763 views between 31 May and 7 July, with no team.",
+              role="Bookings, DJ and MC, filming, editing and posting")
 
 
-def card(p, x):
-    if x["slug"]:
-        href, more, ext = f'{p}work/{x["slug"]}/', "See the project →", ""
-    else:
-        href, more, ext = x["url"], "Watch on YouTube ↗", ' target="_blank" rel="noopener"'
-    return f"""    <a class="card" href="{href}"{ext}>
+def card(p, x, href, more="See the project →"):
+    return f"""    <a class="card" href="{href}">
       <div class="card__img"><img loading="lazy" src="{x['thumb']}" alt=""></div>
       <p class="tag">{x['tag']}</p>
       <h3>{x['title']}</h3>
@@ -192,6 +205,12 @@ def card(p, x):
       <p class="card__role">{x['role']}</p>
       <span class="card__more">{more}</span>
     </a>"""
+
+
+def all_cards(p):
+    c = [card(p, x, f"{p}work/{x['slug']}/") for x in CASES]
+    c.insert(2, card(p, ZANDER, f"{p}dj/", "See Zander Production →"))
+    return "\n".join(c)
 
 
 def next_strip(p, current):
@@ -212,7 +231,7 @@ def case_head(p, x, intro):
 <main>
 <div class="band invert">
 <section class="phead">
-  <a class="phead__back" href="{p}#work">← All work</a>
+  <a class="phead__back" href="{p}work/">← All work</a>
   <p class="tag">{x['tag']}</p>
   <h1 class="phead__title">{x['title']}</h1>
   <p class="phead__intro">{intro}</p>
@@ -223,13 +242,7 @@ def case_head(p, x, intro):
 
 # ---------------------------------------------------------------- pages
 
-def page_home():
-    p = ""
-    cards = "\n".join(card(p, x) for x in PROJECTS)
-    return head(p, "Alexandar Ivanov - Video Producer & Editor",
-                "Alexandar Ivanov - video producer and editor. Series, short film and social content. Looking for a media production internship from February 2027.") + nav(p, "home") + f"""
-<main>
-
+HERO = """
 <!-- ================= HERO ================= -->
 <div class="band invert">
 <section class="hero">
@@ -256,158 +269,171 @@ def page_home():
   </div>
 </section>
 </div>
+"""
 
-<!-- ================= WORK ================= -->
-<section class="section" id="work">
+
+def simple_head(title, intro=None, label=None):
+    lab = f'<p class="label label--accent">{label}</p>' if label else ""
+    it = f'<p class="phead__intro">{intro}</p>' if intro else ""
+    return f"""
+<main>
+<div class="band invert">
+<section class="phead phead--page">
+  {lab}
+  <h1 class="phead__title">{title}</h1>
+  {it}
+</section>
+</div>
+"""
+
+
+def page_home():
+    p = ""
+    return head(p, "Alexandar Ivanov - Video Producer & Editor",
+                "Alexandar Ivanov - video producer and editor. Series, short film and social content. Looking for a media production internship from February 2027.") + nav(p, "home") + "\n<main>\n" + HERO + f"""
+<section class="section">
   <div class="section__head">
     <h2 class="h-xl">Selected work</h2>
+    <a class="section__more" href="work/">All work →</a>
   </div>
   <div class="cards">
-{cards}
+{all_cards(p)}
   </div>
 {logos(p)}
 </section>
+""" + contact_band(p) + foot(p)
 
-<!-- ================= DJ LINE ================= -->
-<div class="band invert">
-  <a class="strip" href="dj/">
-    <span class="label">Zander Production</span>
-    <span class="strip__title">I also run my own DJ and MC business <i aria-hidden="true">→</i></span>
-  </a>
-</div>
 
-<!-- ================= ABOUT ================= -->
-<section class="section" id="about">
-  <div class="about">
-    <figure class="about__photo">
-      <img width="1920" height="1023" loading="lazy" src="{PHOTO_ME}" alt="Alexandar Ivanov">
-    </figure>
-    <div class="about__text">
-      <h2 class="h-xl">About me</h2>
-      <p>I grew up in Bulgaria, went to the Sofia High School of Mathematics and moved to Leeuwarden in 2022 to study Creative Business at NHL Stenden. Across three years of concept projects I've worked on everything from campaign plans to full productions, so I'm comfortable taking an idea through planning and the shoot to a finished edit.</p>
-      <p>From 2023 to 2025 I co-founded and led the PR team of the <b>Bulgarian Society Leeuwarden</b>. I also did a minor in <b>Intercultural and International Communication</b> and an exchange semester in <b>Málaga</b>, so working with people from everywhere is normal for me.</p>
-      <p class="links"><a href="cv.pdf" target="_blank" rel="noopener">Download my CV ↓</a></p>
+def page_work():
+    p = "../"
+    return head(p, "Work - Alexandar Ivanov",
+                "Series, short film and social content by Alexandar Ivanov.") + nav(p, "work") + simple_head(
+        "Work", "Series, short film and social content. Open a project for the full story, the credits and the episodes.") + f"""
+<section class="section section--case">
+  <div class="cards">
+{all_cards(p)}
+  </div>
+{logos(p)}
+</section>
+""" + contact_band(p) + foot(p)
+
+
+def case_page(x, title, desc, intro, credits, facts, extra=""):
+    p = "../../"
+    cr = "".join(f"<div><dt>{a}</dt><dd>{b}</dd></div>" for a, b in credits)
+    fa = "".join(f"<div><dt>{a}</dt><dd>{b}</dd></div>" for a, b in facts)
+    return head(p, title, desc) + nav(p, "work") + case_head(p, x, intro) + f"""
+<section class="section section--case">
+  <div class="yt yt--big" data-id="{x['video']}" data-title="{x['title']}"></div>
+  <p class="case__caption">{"The trailer, cut by me." if x["slug"] != "the-mix-up" else "The full film."}</p>
+
+  <div class="case">
+    <div>
+      <p class="label">Credits</p>
+      <dl class="credits">{cr}</dl>
+    </div>
+    <div>
+      <p class="label">The project</p>
+      <dl class="credits">{fa}</dl>
     </div>
   </div>
+  {extra}
 </section>
-""" + contact(p) + foot(p)
+""" + next_strip(p, x["slug"]) + contact_band(p) + foot(p)
 
 
 def page_witp():
-    p = "../../"
-    x = CASES[0]
-    return head(p, "What Is This Place? - Alexandar Ivanov",
-                "Reality show concept for MATTERS. Main camera on all 3 episodes, editor of episodes 2 and 3, trailer.") + nav(p, "work") + case_head(
-        p, x, "Four blindfolded people get driven to a place they don't know. A host gives them clues until they figure out where they are. We developed the format as a team and shot three episodes to pitch it.") + f"""
-<section class="section section--case">
-  <div class="yt yt--big" data-id="{x['video']}" data-title="What Is This Place? - trailer"></div>
-  <p class="case__caption">The trailer, cut by me.</p>
-
-  <div class="case">
-    <div>
-      <p class="label">Credits</p>
-      <dl class="credits">
-        <div><dt>Concept</dt><dd>with the team</dd></div>
-        <div><dt>Main camera</dt><dd>all 3 episodes</dd></div>
-        <div><dt>Editor</dt><dd>episodes 2 &amp; 3</dd></div>
-        <div><dt>Trailer</dt><dd>cut by me</dd></div>
-      </dl>
-    </div>
-    <div>
-      <p class="label">The project</p>
-      <dl class="credits">
-        <div><dt>Format</dt><dd>reality show concept</dd></div>
-        <div><dt>Episodes</dt><dd>3, shot to pitch</dd></div>
-        <div><dt>With</dt><dd>MATTERS</dd></div>
-      </dl>
-    </div>
-  </div>
-
-  <div class="episodes" data-list="WITP_EPISODES"></div>
-</section>
-""" + next_strip(p, x["slug"]) + contact(p) + foot(p)
+    return case_page(CASES[0], "What Is This Place? - Alexandar Ivanov",
+        "Reality show concept for MATTERS. Main camera on all 3 episodes, editor of episodes 2 and 3, trailer.",
+        "Four blindfolded people get driven to a place they don't know. A host gives them clues until they figure out where they are. We developed the format as a team and shot three episodes to pitch it.",
+        [("Concept", "with the team"), ("Main camera", "all 3 episodes"), ("Editor", "episodes 2 &amp; 3"), ("Trailer", "cut by me")],
+        [("Format", "reality show concept"), ("Episodes", "3, shot to pitch"), ("With", "MATTERS")],
+        '<div class="episodes" data-list="WITP_EPISODES"></div>')
 
 
 def page_aym():
-    p = "../../"
-    x = CASES[1]
-    return head(p, "Are You Mental? - Alexandar Ivanov",
-                "Challenge series. Main camera and editor on both episodes, trailer.") + nav(p, "work") + case_head(
-        p, x, "Two guys, a list of challenges, no polish on purpose. The tone of the show was made in the edit, from a big pile of raw footage to something that feels loose but keeps moving.") + f"""
-<section class="section section--case">
-  <div class="yt yt--big" data-id="{x['video']}" data-title="Are You Mental? - trailer"></div>
-  <p class="case__caption">The trailer, cut by me.</p>
-
-  <div class="case">
-    <div>
-      <p class="label">Credits</p>
-      <dl class="credits">
-        <div><dt>Writing</dt><dd>with the team</dd></div>
-        <div><dt>Main camera</dt><dd>both episodes</dd></div>
-        <div><dt>Editor</dt><dd>both episodes</dd></div>
-        <div><dt>Trailer</dt><dd>cut by me</dd></div>
-      </dl>
-    </div>
-    <div>
-      <p class="label">The project</p>
-      <dl class="credits">
-        <div><dt>Format</dt><dd>challenge series</dd></div>
-        <div><dt>Episodes</dt><dd>2 + trailer</dd></div>
-        <div><dt>Style</dt><dd>raw, made in the edit</dd></div>
-      </dl>
-    </div>
-  </div>
-
-  <div class="episodes" data-list="AYM_EPISODES"></div>
-</section>
-""" + next_strip(p, x["slug"]) + contact(p) + foot(p)
+    return case_page(CASES[1], "Are You Mental? - Alexandar Ivanov",
+        "Challenge series. Main camera and editor on both episodes, trailer.",
+        "Two guys, a list of challenges, no polish on purpose. The tone of the show was made in the edit, from a big pile of raw footage to something that feels loose but keeps moving.",
+        [("Writing", "with the team"), ("Main camera", "both episodes"), ("Editor", "both episodes"), ("Trailer", "cut by me")],
+        [("Format", "challenge series"), ("Episodes", "2 + trailer"), ("Style", "raw, made in the edit")],
+        '<div class="episodes" data-list="AYM_EPISODES"></div>')
 
 
-def page_social():
-    p = "../../"
-    x = CASES[2]
-    return head(p, "@djzanderr social content - Alexandar Ivanov",
-                "1,003,763 views between 31 May and 7 July on my own Instagram, filmed and edited by me.") + nav(p, "work") + case_head(
-        p, x, "As a DJ I needed content and had no team, so I built my own routine: film at the show, edit the same night, post the next day. Short videos built around the moment the crowd reacts.") + f"""
-<section class="section section--case">
-  <div class="insta insta--case">
-    <div class="bubbles">
-      <div class="bubble bubble--hot"><b data-count="1003763">1,003,763</b><span>views between 31 May and 7 July</span></div>
-      <div class="bubble"><b data-count="602596">602,596</b><span>accounts reached</span></div>
-      <div class="bubble"><b data-count="92" data-suffix="%">92%</b><span>of views from people who didn't follow me yet</span></div>
-      <div class="bubble"><b data-count="4293">4,293</b><span>new followers in 30 days, almost all from reels</span></div>
-    </div>
-    <div class="insta__text">
-      <p class="label">The insights</p>
-      <p>Screenshots straight from Instagram. Almost all of the reach came from people who didn't follow me yet, which means the reels were getting pushed to new audiences on their own.</p>
-      <p class="links"><a href="https://www.instagram.com/djzanderr/" target="_blank" rel="noopener">Watch the reels on Instagram ↗</a></p>
-    </div>
-    <div class="insta__shots">
-      <img width="1179" height="2556" loading="lazy" src="{CDN}2014eb0c-6765-4a27-87a1-fd05a0edc585_rw_1200.PNG?h=2306495005db6a0f2586b1e92e5cd2e3" alt="Instagram insights: 1,003,763 views">
-      <img width="1179" height="2556" loading="lazy" src="{CDN}0a34cb01-e3d6-468a-976a-e2b182264d6f_rw_1200.PNG?h=fad3f78056be6dda5270d97dbaef4bfd" alt="Instagram insights: 4,293 new followers in 30 days">
-    </div>
-    <div id="reels" class="reels"></div>
-  </div>
-</section>
+def page_mixup():
+    return case_page(CASES[2], "The Mix Up! - Alexandar Ivanov",
+        "Short film made in 24 hours. Planning, camera and edit by Alexandar Ivanov.",
+        "A semester assignment with one rule: start to finish in a day. I planned the shoot, filmed it and delivered the final edit before the deadline.",
+        [("Planning", "solo"), ("Camera", "solo"), ("Editor", "solo")],
+        [("Format", "short film"), ("Deadline", "24 hours"), ("Context", "semester assignment")])
 
+
+def page_about():
+    p = "../"
+    return head(p, "About - Alexandar Ivanov",
+                "About Alexandar Ivanov, video producer and editor from Bulgaria, based in the Netherlands.") + nav(p, "about") + f"""
+<main>
 <div class="band invert">
-  <section class="section section--tight">
-    <div class="row row--first">
-      <div class="row__head">
-        <h3>Week with Zander</h3>
-        <p>My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.</p>
-      </div>
-      <div class="slider" data-list="VLOGS"></div>
+<section class="section section--about">
+  <div class="about">
+    <figure class="about__photo">
+      <img width="1920" height="1023" src="{PHOTO_ME}" alt="Alexandar Ivanov">
+    </figure>
+    <div class="about__text">
+      <h1 class="h-xl">About me</h1>
+      <p>I grew up in Bulgaria, went to the Sofia High School of Mathematics and moved to Leeuwarden in 2022 to study Creative Business at NHL Stenden. Across three years of concept projects I've worked on everything from campaign plans to full productions, so I'm comfortable taking an idea through planning and the shoot to a finished edit.</p>
+      <p>I've always loved music. I started playing guitar as a kid, and then came DJing, and with it remixes, mashups and tracks that are now past <b>500,000 streams on Spotify</b>, <b>100,000 listens a year on SoundCloud</b> and <b>1.5 million views on YouTube</b>. I've performed and MC'd at clubs, bars, private events and dinner parties.</p>
+      <p>From 2023 to 2025 I co-founded and led the PR team of the <b>Bulgarian Society Leeuwarden</b>. I shaped the society's look and grew its Instagram from nothing, sat in on interviews to pick new members, joined the weekly team meetings, and handled the club owners and venues for our events, where I was also the DJ.</p>
+      <p>I did a six-month minor in <b>Intercultural and International Communication</b> and a semester exchange in <b>Málaga</b>, so working with people from everywhere is normal for me.</p>
     </div>
-  </section>
+  </div>
+</section>
 </div>
-""" + next_strip(p, x["slug"]).replace('<div class="band invert">', '<div class="band">', 1) + contact(p) + foot(p)
+
+<section class="section">
+  <div class="cvgrid cvgrid--page">
+    <div class="cvcol">
+      <p class="label">Experience</p>
+      <ol class="timeline">
+        <li><span>2020 - now</span><div><b>Freelance DJ / Zander Production</b><p>Own registered business: bookings, clients, international logistics, shows and content</p></div></li>
+        <li><span>2022 - now</span><div><b>Freelance video editor &amp; content creator</b><p>Concept, filming and editing for university, freelance and personal projects</p></div></li>
+        <li><span>2023 - 2025</span><div><b>Bulgarian Society Leeuwarden</b><p>Co-founder and Head of PR</p></div></li>
+        <li><span>2019 - 2022</span><div><b>System administrator, Finance Help Ltd</b><p>Part-time IT support around the office, WordPress</p></div></li>
+      </ol>
+    </div>
+    <div class="cvcol">
+      <p class="label">Education</p>
+      <ol class="timeline">
+        <li><span>2022 - now</span><div><b>NHL Stenden, Creative Business</b><p>Minor in Intercultural &amp; International Communication, exchange semester in Málaga</p></div></li>
+        <li><span>2016 - 2021</span><div><b>Sofia High School of Mathematics</b></div></li>
+      </ol>
+      <p class="label label--gap">Tools</p>
+      <p class="plainlist">DaVinci Resolve / Premiere Pro / Adobe Creative Cloud / CapCut / Canva / Canon 90D / FL Studio / Logic / Ableton / Pioneer CDJ-3000 / Microsoft Office</p>
+      <p class="label label--gap">Also good at</p>
+      <p class="plainlist">Concept development / content strategy / photography / audio engineering / planning and deadlines / team leadership</p>
+      <p class="label label--gap">Languages</p>
+      <p class="plainlist">English / Bulgarian</p>
+      <p class="links"><a href="{p}cv.pdf" target="_blank" rel="noopener">Download my CV ↓</a></p>
+    </div>
+  </div>
+</section>
+""" + contact_band(p) + foot(p)
+
+
+def page_contact():
+    p = "../"
+    return head(p, "Contact - Alexandar Ivanov",
+                "Get in touch with Alexandar Ivanov for internships, video work or DJ bookings.") + nav(p, "contact") + "\n<main>\n" + contact(
+        p, "Let's work<br>together",
+        "Email is the fastest way to reach me. I can travel anywhere in the Netherlands and do an online call any time. For DJ bookings, send me the date, the place and the vibe.").replace(
+        '<h2 class="contact__title">', '<h1 class="contact__title">').replace("</h2>", "</h1>", 1).replace(
+        'class="contact"', 'class="contact contact--page"', 1) + foot(p)
 
 
 def page_dj():
     p = "../"
-    return head(p, "Zander Production - DJ & MC",
-                "DJ, MC and event content by Zander Production. Clubs, concerts, festivals and private events in the Netherlands and abroad.") + nav(p, "dj") + f"""
+    return head(p, "Zander Production - DJ, MC & content",
+                "DJ, MC and event content by Zander Production. 1,003,763 Instagram views between 31 May and 7 July, clubs, concerts and private events.") + nav(p, "dj") + f"""
 <main>
 <div class="band invert">
 <section class="phead phead--dj">
@@ -415,13 +441,15 @@ def page_dj():
   <h1 class="phead__title">DJ, MC and the guy filming it</h1>
   <div class="phead__cols">
     <p>I started playing clubs and events in 2020 and it turned into a real job, so I registered it with the <a href="https://www.kvk.nl/bestellen/#/99829398000064874893?origin=search" target="_blank" rel="noopener">KVK</a>. I do all of it: bookings and client contact, the rider, the set, playing and MC-ing, and then filming and editing the recap and promo content.</p>
-    <p>Playing for a crowd every weekend teaches you to read a room and change plans on the spot. Remixes, mashups and my own tracks are past <b>500,000 streams on Spotify</b>, <b>100,000 listens a year on SoundCloud</b> and <b>1.5 million views on YouTube</b>.</p>
+    <p>Playing for a crowd every weekend teaches you to read a room and change plans on the spot. That's the same thing I do in an edit. Remixes, mashups and my own tracks are past <b>500,000 streams on Spotify</b> and <b>1.5 million views on YouTube</b>.</p>
   </div>
-  <p class="links"><a href="#contact">Book a show →</a></p>
+  <nav class="jump" aria-label="On this page">
+    <a href="#shows">Shows</a><a href="#content">Social content</a><a href="#posters">Posters</a><a href="#music">Music</a><a href="#contact">Book a show</a>
+  </nav>
 </section>
 </div>
 
-<section class="section">
+<section class="section" id="shows">
   <ul class="highlights">
     <li><span>Concerts</span><p>DJ at concerts with big artists like <b>Emanuela, BNR, Andrea, Bilyanish, Mom4eto</b> and more</p></li>
     <li><span>Sound</span><p>Audio engineering and soundchecks for big artists</p></li>
@@ -434,8 +462,47 @@ def page_dj():
     <img width="1333" height="2000" loading="lazy" src="{CDN}4475cec4-844a-49d6-9e04-3eae8bce22c1_rw_1920.png?h=71246d4ed41777e5b41be6e4ed71b43b" alt="DJZander mixing">
     <img width="3840" height="2560" class="photos__d" loading="lazy" src="{CDN}657403d0-4243-46fe-b70a-8abb69768e06_rw_3840.jpg?h=efc9db612df5a4147626837a48fab024" alt="DJZander at a show">
   </div>
+</section>
+
+<div class="band invert" id="content">
+<section class="section">
+  <div class="insta insta--case">
+    <div class="insta__text insta__text--head">
+      <p class="tag">Social content / my own channel</p>
+      <h2 class="h-xl">@djzanderr</h2>
+      <p>As a DJ I needed content and had no team, so I built my own routine: film at the show, edit the same night, post the next day. Short videos built around the moment the crowd reacts.</p>
+      <p class="card__role">Filming, editing and posting</p>
+    </div>
+    <div class="bubbles">
+      <div class="bubble bubble--hot"><b data-count="1003763">1,003,763</b><span>views between 31 May and 7 July</span></div>
+      <div class="bubble"><b data-count="602596">602,596</b><span>accounts reached</span></div>
+      <div class="bubble"><b data-count="92" data-suffix="%">92%</b><span>of views from people who didn't follow me yet</span></div>
+      <div class="bubble"><b data-count="4293">4,293</b><span>new followers in 30 days, almost all from reels</span></div>
+    </div>
+    <div class="insta__text">
+      <p class="label">The insights</p>
+      <p>Screenshots straight from Instagram. Almost all of the reach came from people who didn't follow me yet, so the reels were getting pushed to new audiences on their own.</p>
+      <p class="links"><a href="https://www.instagram.com/djzanderr/" target="_blank" rel="noopener">Watch the reels on Instagram ↗</a></p>
+    </div>
+    <div class="insta__shots">
+      <img width="1179" height="2556" loading="lazy" src="{CDN}2014eb0c-6765-4a27-87a1-fd05a0edc585_rw_1200.PNG?h=2306495005db6a0f2586b1e92e5cd2e3" alt="Instagram insights: 1,003,763 views">
+      <img width="1179" height="2556" loading="lazy" src="{CDN}0a34cb01-e3d6-468a-976a-e2b182264d6f_rw_1200.PNG?h=fad3f78056be6dda5270d97dbaef4bfd" alt="Instagram insights: 4,293 new followers in 30 days">
+    </div>
+    <div id="reels" class="reels"></div>
+  </div>
 
   <div class="row">
+    <div class="row__head">
+      <h3>Week with Zander</h3>
+      <p>My vlog series about gigs, travel and training. Nothing is scripted, so every episode gets found in the edit.</p>
+    </div>
+    <div class="slider" data-list="VLOGS"></div>
+  </div>
+</section>
+</div>
+
+<section class="section section--tight" id="posters">
+  <div class="row row--first">
     <div class="row__head row__head--inline">
       <h3>The posters</h3>
       <p>Some of the nights I've played.</p>
@@ -444,7 +511,7 @@ def page_dj():
   </div>
 </section>
 
-<div class="band invert">
+<div class="band invert" id="music">
 <section class="section section--tight">
   <div class="row row--first">
     <div class="row__head row__head--inline">
@@ -503,6 +570,14 @@ def page_dj():
               "Clubs, concerts, private events and dinner parties. Send me the date, the place and the vibe, and I'll get back to you fast.") + foot(p)
 
 
+REDIRECT = """<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Zander Production</title>
+<meta name="robots" content="noindex"><link rel="canonical" href="{to}">
+<meta http-equiv="refresh" content="0; url={to}"></head>
+<body><a href="{to}">Zander Production</a></body></html>
+"""
+
+
 def write(rel, html):
     path = os.path.join(ROOT, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -513,7 +588,11 @@ def write(rel, html):
 
 if __name__ == "__main__":
     write("index.html", page_home())
+    write("work/index.html", page_work())
     write("work/what-is-this-place/index.html", page_witp())
     write("work/are-you-mental/index.html", page_aym())
-    write("work/social-content/index.html", page_social())
+    write("work/the-mix-up/index.html", page_mixup())
+    write("work/social-content/index.html", REDIRECT.format(to="../../dj/#content"))
     write("dj/index.html", page_dj())
+    write("about/index.html", page_about())
+    write("contact/index.html", page_contact())
