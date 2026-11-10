@@ -171,6 +171,7 @@ document.querySelectorAll(".episodes").forEach((box) => {
   const label = btn.querySelector(".nav__toggle-text");
   const set = (open) => {
     document.body.classList.toggle("menu-open", open);
+    document.documentElement.classList.toggle("menu-lock", open);
     btn.setAttribute("aria-expanded", String(open));
     menu.setAttribute("aria-hidden", String(!open));
     label.textContent = open ? "Close" : "Menu";
@@ -192,6 +193,8 @@ document.querySelectorAll(".episodes").forEach((box) => {
     const line = window.innerHeight * 0.35;
     let active = null;
     for (const s of sections) if (s.getBoundingClientRect().top <= line) active = s.id;
+    const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4;
+    if (atBottom && sections.length) active = sections[sections.length - 1].id;
     if (active === current) return;
     current = active;
     const url = active ? "#" + active : location.pathname + location.search;
@@ -238,6 +241,13 @@ document.querySelectorAll(".episodes").forEach((box) => {
     });
   });
 })();
+
+// Home: back to the very top
+document.querySelectorAll('a[href="#top"]').forEach((a) => a.addEventListener("click", (e) => {
+  e.preventDefault();
+  setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 40);
+  history.replaceState(null, "", location.pathname + location.search);
+}));
 
 // Build sliders
 document.querySelectorAll(".slider").forEach((slider) => {
