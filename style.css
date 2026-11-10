@@ -472,3 +472,4 @@ html{overflow-x:clip}
 .bsl__grid img{width:100%;height:auto}
 .bubbles--one{grid-template-columns:1fr}
 @media (max-width:760px){.bsl{grid-template-columns:1fr}.bsl__reel{max-width:420px}}
+.jump a.jump__dl{background:var(--ink);color:var(--paper);border-color:var(--ink)}.jump a.jump__dl:hover{background:var(--accent);border-color:var(--accent);color:var(--black)}
