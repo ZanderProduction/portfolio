@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "47"  # bump to make browsers fetch fresh css/js
+V = "48"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -429,6 +429,13 @@ def page_bsl():
         "I co-founded the Bulgarian Society Leeuwarden and led its PR team, shaping the society's look and public profile. I grew the Instagram from the very beginning in 2023 and made most of the posters and reels until I left the society in June 2025.",
         [("Role", "co-founder, Head of PR"), ("Instagram", "grown from zero"), ("Content", "most posters and reels"), ("Events", "DJ, venues and clubs")],
         [("Years", "2023 - June 2025"), ("Team", "weekly meetings"), ("Members", "interviews and selection"), ("Best reel", "376K views")],
+        '''<div class="row">
+    <div class="row__head row__head--inline">
+      <h3>Selected reels</h3>
+      <p>Made by me for the society. Press play or open them on Instagram.</p>
+    </div>
+    <div class="slider slider--reels" data-list="REELS_BSL"></div>
+  </div>''',
         media=media, credits_label="What I did")
 
 
@@ -553,6 +560,14 @@ def page_dj():
       <img width="1179" height="2556" loading="lazy" src="{CDN}0a34cb01-e3d6-468a-976a-e2b182264d6f_rw_1200.PNG?h=fad3f78056be6dda5270d97dbaef4bfd" alt="Instagram insights: 4,293 new followers in 30 days">
     </div>
     <div id="reels" class="reels"></div>
+  </div>
+
+  <div class="row">
+    <div class="row__head row__head--inline">
+      <h3>Selected reels</h3>
+      <p>Filmed at the show, edited that night, posted the next day.</p>
+    </div>
+    <div class="slider slider--reels" data-list="REELS_DJ"></div>
   </div>
 </section>
 </div>

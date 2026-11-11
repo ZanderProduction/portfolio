@@ -10,6 +10,16 @@ const REELS = [
   // "https://www.instagram.com/reel/XXXXXXXXXXX/",
 ];
 
+// Selected Instagram reels: just the code from the link (instagram.com/reel/CODE/)
+const REELS_DJ = [
+  "DY2UGpsIm9r", "DYcpzHooQpe", "DVbUdrCCMBl", "DS16tixiOk1", "DTAQvaBiC9j",
+  "De-GVrgx_fp", "DdeaPWdILGb", "DcPK1w_IAHn", "DcJ28nuRytf", "Db6clx7RaZN",
+  "DbGytL9xhfm", "DaviiH9oFrZ", "DZLDJJFovbO",
+];
+const REELS_BSL = [
+  "C374lP_NG5P", "C_n1rhtNln-", "DAvxHGoNigO", "DE29d-StwAp", "DF_A-R5N5fi", "DGlJ1aTNByA", "DKAMgxMtZv6",
+];
+
 // Full episodes shown under a project: [video ID, title, small line, "link" if age-restricted]
 // Age-restricted videos can't play inside other websites, so "link" opens them on YouTube.
 const WITP_EPISODES = [
@@ -261,7 +271,14 @@ const navLock = { id: undefined };
 document.querySelectorAll(".slider").forEach((slider) => {
   const name = slider.dataset.list;
   let slides;
-  if (name === "POSTERS") {
+  const reels = { REELS_DJ, REELS_BSL }[name];
+  if (reels) {
+    slides = reels.map((id) =>
+      `<div class="slide slide--reel"><div class="reel"><iframe src="https://www.instagram.com/reel/${esc(id)}/embed/" ` +
+      `loading="lazy" scrolling="no" allowtransparency="true" allow="encrypted-media; fullscreen" title="Instagram reel"></iframe></div>` +
+      `<a class="slide__meta reel__link" href="https://www.instagram.com/reel/${esc(id)}/" target="_blank" rel="noopener">Open on Instagram ↗</a></div>`
+    );
+  } else if (name === "POSTERS") {
     slides = POSTERS.map((p) => {
       const src = /^https?:/.test(p) ? p : /^images\//.test(p) ? ROOT + p : CDN + p;
       return `<div class="slide"><img loading="lazy" src="${esc(src)}" alt="DJZander show poster"></div>`;
@@ -276,7 +293,7 @@ document.querySelectorAll(".slider").forEach((slider) => {
     `<div class="slider__track">${slides.join("")}</div>` +
     `<div class="slider__nav"><button type="button" data-dir="-1" aria-label="Previous">←</button>` +
     `<button type="button" data-dir="1" aria-label="Next">→</button>` +
-    `<span class="slider__count">${slides.length} ${name === "POSTERS" ? "posters" : "videos"}</span></div>`;
+    `<span class="slider__count">${slides.length} ${name === "POSTERS" ? "posters" : reels ? "reels" : "videos"}</span></div>`;
 
   const track = slider.querySelector(".slider__track");
   slider.querySelectorAll("[data-dir]").forEach((b) =>
