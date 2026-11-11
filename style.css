@@ -493,7 +493,7 @@ html{overflow-x:clip}
 /* Instagram reels slider */
 .slider--reels .slide{flex:0 0 calc((100% - 42px)/4)}
 .slide--reel{container-type:inline-size}
-.reel{width:100%;height:calc(125cqw + 96px);overflow:hidden;background:#fff;border-radius:3px}
+.reel{width:100%;height:calc(125cqw + 58px);overflow:hidden;background:#fff;border-radius:3px}
 .reel iframe{display:block;width:100%;height:900px;border:0}
 .reel__link{display:inline-block;margin-top:8px;font-weight:600;text-decoration:none}
 .reel__link:hover{color:var(--accent)}

@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "48"  # bump to make browsers fetch fresh css/js
+V = "49"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
