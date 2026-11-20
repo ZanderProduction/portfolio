@@ -543,3 +543,10 @@ html{overflow-x:clip}
 @media (max-width:860px){.wmap__body{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.wmap__pulse{animation:none;opacity:0}}
 @media (max-width:560px){.wmap.is-zoomed .wmap__stage{aspect-ratio:1/1.15}}
+
+/* performance: endless animations only while visible */
+.dot-live{animation:none}
+.menu-open .dot-live{animation:pulse 1.8s infinite}
+.wmap__stage:not(.in-view) .wmap__pulse{animation:none;opacity:0}
+.allwork:not(.in-view) i{animation:none}
+.reel:empty{background:var(--paper-2)}

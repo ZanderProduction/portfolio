@@ -167,6 +167,12 @@ document.querySelectorAll(".episodes").forEach((box) => {
       if (d.event === "onReady" || (d.info && d.info.playerState === 1)) cmd("unloadModule", ["captions"]);
     } catch (_) {}
   });
+  // pause the loop when it's off-screen or the tab is hidden, so it doesn't keep the browser busy
+  let inView = true;
+  const sync = () => cmd(inView && !document.hidden ? "playVideo" : "pauseVideo");
+  if ("IntersectionObserver" in window)
+    new IntersectionObserver(([en]) => { inView = en.isIntersecting; sync(); }).observe(box);
+  document.addEventListener("visibilitychange", sync);
   const btn = box.querySelector(".hero-loop__sound");
   let soundOn = false;
   btn.addEventListener("click", () => {
@@ -274,8 +280,7 @@ document.querySelectorAll(".slider").forEach((slider) => {
   const reels = { REELS_DJ, REELS_BSL }[name];
   if (reels) {
     slides = reels.map((id) =>
-      `<div class="slide slide--reel"><div class="reel"><iframe src="https://www.instagram.com/reel/${esc(id)}/embed/" ` +
-      `loading="lazy" scrolling="no" allowtransparency="true" allow="encrypted-media; fullscreen" title="Instagram reel"></iframe></div>` +
+      `<div class="slide slide--reel"><div class="reel" data-reel="${esc(id)}"></div>` +
       `<a class="slide__meta reel__link" href="https://www.instagram.com/reel/${esc(id)}/" target="_blank" rel="noopener">Open on Instagram ↗</a></div>`
     );
   } else if (name === "POSTERS") {
@@ -319,6 +324,30 @@ document.querySelectorAll(".slider").forEach((slider) => {
   });
   track.addEventListener("click", (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
   track.addEventListener("dragstart", (e) => e.preventDefault());
+
+  // Instagram reels are heavy: build each one only when it slides into view, and only once the slider is near the screen
+  if (reels) {
+    const load = (box) => {
+      if (box.firstChild) return;
+      const f = document.createElement("iframe");
+      f.src = `https://www.instagram.com/reel/${box.dataset.reel}/embed/`;
+      f.scrolling = "no";
+      f.title = "Instagram reel";
+      f.setAttribute("allow", "encrypted-media; fullscreen");
+      box.appendChild(f);
+    };
+    const boxes = [...slider.querySelectorAll(".reel[data-reel]")];
+    if (!("IntersectionObserver" in window)) { boxes.forEach(load); return; }
+    const inner = new IntersectionObserver((es) => es.forEach((en) => {
+      if (en.isIntersecting) { load(en.target); inner.unobserve(en.target); }
+    }), { root: track, rootMargin: "0px 40% 0px 40%" });
+    const outer = new IntersectionObserver(([en]) => {
+      if (!en.isIntersecting) return;
+      outer.disconnect();
+      boxes.forEach((b) => inner.observe(b));
+    }, { rootMargin: "300px 0px" });
+    outer.observe(slider);
+  }
 });
 
 // YouTube lite embeds: thumbnail first, real player on click
@@ -501,3 +530,9 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
   draw(vb);
   window.addEventListener("resize", () => (current ? zoomTo(current, (map.querySelector(".wmap__city.is-active") || {}).dataset?.name) : draw([0, 0, W, H])));
 })();
+
+// Endless animations only run while you can see them (saves a lot of work in Chrome and Brave)
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver((es) => es.forEach((en) => en.target.classList.toggle("in-view", en.isIntersecting)));
+  document.querySelectorAll(".wmap__stage, .allwork").forEach((el) => io.observe(el));
+} else document.querySelectorAll(".wmap__stage, .allwork").forEach((el) => el.classList.add("in-view"));
