@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "52"  # bump to make browsers fetch fresh css/js
+V = "53"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -515,7 +515,7 @@ def page_dj():
     <p>Playing for a crowd every weekend teaches you to read a room and change plans on the spot. That's the same thing I do in an edit. Remixes, mashups and my own tracks are past <b>500,000 streams on Spotify</b> and <b>1.5 million views on YouTube</b>.</p>
   </div>
   <nav class="jump" aria-label="On this page">
-    <a href="#shows">Shows</a><a href="#map">Map</a><a href="#content">Social content</a><a href="#posters">Posters</a><a href="#music">Music</a><a href="#contact">Book a show</a><a class="jump__dl" href="DJZander-Rider.pdf?v=3" download>Tech rider ↓</a>
+    <a href="#shows">Shows</a><a href="#map">Map</a><a href="#posters">Posters</a><a href="#content">Social content</a><a href="#music">Music</a><a href="#contact">Book a show</a><a class="jump__dl" href="DJZander-Rider.pdf?v=3" download>Tech rider ↓</a>
   </nav>
 </section>
 </div>
@@ -536,8 +536,19 @@ def page_dj():
 {played_map()}
 </section>
 
-<div class="band invert" id="content">
-<section class="section">
+<div class="band invert" id="posters">
+<section class="section section--tight">
+  <div class="row row--first">
+    <div class="row__head row__head--inline">
+      <h3>The posters</h3>
+      <p>Some of the nights I've played.</p>
+    </div>
+    <div class="slider slider--posters" data-list="POSTERS"></div>
+  </div>
+</section>
+</div>
+
+<section class="section" id="content">
   <div class="insta insta--case">
     <div class="insta__text insta__text--head">
       <p class="tag">Social content / my own channel</p>
@@ -563,18 +574,6 @@ def page_dj():
     <div id="reels" class="reels"></div>
   </div>
 </section>
-</div>
-
-<section class="section section--tight" id="posters">
-  <div class="row row--first">
-    <div class="row__head row__head--inline">
-      <h3>The posters</h3>
-      <p>Some of the nights I've played.</p>
-    </div>
-    <div class="slider slider--posters" data-list="POSTERS"></div>
-  </div>
-</section>
-
 <div class="band invert" id="music">
 <section class="section section--tight">
   <div class="row row--first">
