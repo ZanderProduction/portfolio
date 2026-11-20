@@ -167,12 +167,6 @@ document.querySelectorAll(".episodes").forEach((box) => {
       if (d.event === "onReady" || (d.info && d.info.playerState === 1)) cmd("unloadModule", ["captions"]);
     } catch (_) {}
   });
-  // pause the loop when it's off-screen or the tab is hidden, so it doesn't keep the browser busy
-  let inView = true;
-  const sync = () => cmd(inView && !document.hidden ? "playVideo" : "pauseVideo");
-  if ("IntersectionObserver" in window)
-    new IntersectionObserver(([en]) => { inView = en.isIntersecting; sync(); }).observe(box);
-  document.addEventListener("visibilitychange", sync);
   const btn = box.querySelector(".hero-loop__sound");
   let soundOn = false;
   btn.addEventListener("click", () => {
