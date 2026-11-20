@@ -417,3 +417,87 @@ if ("IntersectionObserver" in window) {
 
 const yearEl = document.getElementById("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+// "Where I've played" map on the DJZander page: tap a country to zoom in, tap a city to highlight it
+(() => {
+  const map = document.querySelector(".wmap");
+  if (!map) return;
+  const svg = map.querySelector(".wmap__svg");
+  const W = +map.dataset.w, H = +map.dataset.h;
+  const zooms = JSON.parse(map.dataset.zoom);
+  const cities = [...map.querySelectorAll(".wmap__city")];
+  const back = map.querySelector(".wmap__back");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let vb = [0, 0, W, H], anim = 0, current = null;
+
+  const draw = (v) => {
+    vb = v;
+    svg.setAttribute("viewBox", v.map((n) => n.toFixed(2)).join(" "));
+    // map units per screen pixel: keeps dots and labels the same size on screen, zoomed or not, phone or laptop
+    const s = v[2] / (svg.clientWidth || W);
+    cities.forEach((c) => c.setAttribute("transform", `translate(${c.dataset.x} ${c.dataset.y}) scale(${s.toFixed(4)})`));
+  };
+  const fit = ([x0, y0, x1, y1]) => {
+    // match the shape of the map box on screen (it gets taller on phones when zoomed in)
+    const A = (svg.clientWidth || W) / (svg.clientHeight || H);
+    let w = x1 - x0, h = y1 - y0;
+    const pad = Math.max(w, h) * (A < 1.1 ? 0.1 : 0.18) + 18;
+    x0 -= pad; y0 -= pad; w += pad * 2; h += pad * 2;
+    if (w / h > A) { const nh = w / A; y0 -= (nh - h) / 2; h = nh; }
+    else { const nw = h * A; x0 -= (nw - w) / 2; w = nw; }
+    return [x0, y0, w, h];
+  };
+  const go = (target) => {
+    cancelAnimationFrame(anim);
+    if (reduce) return draw(target);
+    const from = vb.slice(), t0 = performance.now(), dur = 650;
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+    const step = (t) => {
+      const p = Math.min(1, (t - t0) / dur), e = ease(p);
+      draw(from.map((f, i) => f + (target[i] - f) * e));
+      if (p < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  };
+  const mark = (sel, on) => map.querySelectorAll(sel).forEach((el) => el.classList.toggle("is-on", on(el)));
+  const setActiveCity = (name) => {
+    cities.forEach((c) => c.classList.toggle("is-active", c.dataset.name === name));
+    mark(".wmap__chip", (b) => b.dataset.name === name);
+  };
+  const zoomTo = (cc, cityName) => {
+    const z = zooms[cc];
+    if (!z) return;
+    const same = (a, b) => a && b && a.join() === b.join();
+    current = cc;
+    map.classList.add("is-zoomed");
+    back.hidden = false;
+    // Netherlands and Belgium share one view, so show both countries' labels there
+    const shown = Object.keys(zooms).filter((k) => same(zooms[k], z));
+    cities.forEach((c) => c.classList.toggle("show-label", shown.includes(c.dataset.cc)));
+    mark(".wmap__land path.is-played", (p) => shown.includes(p.dataset.cc));
+    mark(".wmap__group", (g) => g.dataset.cc === cc);
+    setActiveCity(cityName || null);
+    go(fit(z));
+  };
+  const reset = () => {
+    current = null;
+    map.classList.remove("is-zoomed");
+    back.hidden = true;
+    cities.forEach((c) => c.classList.remove("show-label"));
+    mark(".wmap__land path.is-played", () => false);
+    mark(".wmap__group", () => false);
+    setActiveCity(null);
+    go([0, 0, W, H]);
+  };
+
+  map.querySelectorAll(".wmap__land path.is-played").forEach((p) =>
+    p.addEventListener("click", () => (current === p.dataset.cc ? null : zoomTo(p.dataset.cc))));
+  cities.forEach((c) => c.addEventListener("click", (e) => { e.stopPropagation(); zoomTo(c.dataset.cc, c.dataset.name); }));
+  map.querySelectorAll(".wmap__country").forEach((b) =>
+    b.addEventListener("click", () => (current === b.dataset.cc ? reset() : zoomTo(b.dataset.cc))));
+  map.querySelectorAll(".wmap__chip").forEach((b) =>
+    b.addEventListener("click", () => zoomTo(b.dataset.cc, b.dataset.name)));
+  back.addEventListener("click", reset);
+  draw(vb);
+  window.addEventListener("resize", () => (current ? zoomTo(current, (map.querySelector(".wmap__city.is-active") || {}).dataset?.name) : draw([0, 0, W, H])));
+})();

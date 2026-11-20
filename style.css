@@ -499,3 +499,47 @@ html{overflow-x:clip}
 .reel__link:hover{color:var(--accent)}
 @media (max-width:900px){.slider--reels .slide{flex-basis:calc((100% - 28px)/3)}}
 @media (max-width:560px){.slider--reels .slide{flex-basis:78%}}
+
+/* ===== "Where I've played" map (DJZander page) ===== */
+.wmap{margin-top:clamp(56px,8vw,110px);padding-top:28px;border-top:1px solid var(--ink)}
+.wmap__head{display:flex;align-items:baseline;gap:8px 20px;flex-wrap:wrap;margin-bottom:clamp(20px,3vw,32px)}
+.wmap__head h3{font-weight:900;font-stretch:66%;text-transform:uppercase;font-size:clamp(40px,5.4vw,80px);line-height:.88;letter-spacing:-.01em}
+.wmap__head p{color:var(--muted)}
+.wmap__head p b{color:var(--accent)}
+.wmap__body{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:clamp(20px,3vw,44px);align-items:start}
+.wmap__stage{position:relative;background:var(--black);border:1px solid var(--line);overflow:hidden}
+.wmap__stage{aspect-ratio:1000/760}
+.wmap__svg{display:block;width:100%;height:100%;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.wmap__land path{fill:#16302a;stroke:#0a1713;stroke-width:.8px;vector-effect:non-scaling-stroke;transition:fill .3s}
+.wmap__land path.is-played{fill:#2e5a4b;stroke:rgba(238,233,223,.45);cursor:pointer}
+.wmap__land path.is-played:hover{fill:#3a6d5c}
+.wmap__land path.is-played.is-on{fill:#3d7562}
+.wmap__city{cursor:pointer;outline:none}
+.wmap__dot{fill:var(--accent);stroke:#07110e;stroke-width:1.5px;transition:r .2s}
+.wmap__pulse{fill:var(--accent);opacity:.35;transform-box:fill-box;transform-origin:center;animation:wpulse 2.4s ease-out infinite}
+.wmap__city:nth-child(3n+1) .wmap__pulse{animation-delay:.8s}
+.wmap__city:nth-child(3n+2) .wmap__pulse{animation-delay:1.6s}
+@keyframes wpulse{0%{transform:scale(.6);opacity:.55}100%{transform:scale(2.4);opacity:0}}
+.wmap__city.is-next .wmap__dot{fill:#07110e;stroke:var(--accent);stroke-width:2.5px}
+.wmap__city text{font:700 14px/1 Archivo,system-ui,sans-serif;fill:#eee9df;paint-order:stroke;stroke:#07110e;stroke-width:4px;stroke-linejoin:round;opacity:0;transition:opacity .25s;pointer-events:none}
+.wmap__city:hover text,.wmap__city.show-label text,.wmap__city.is-active text{opacity:1}
+.wmap__city:hover .wmap__dot{r:7}
+.wmap__city.is-active .wmap__dot{r:8}
+.wmap__city.is-active text{fill:var(--accent);font-size:16px}
+.wmap__back{position:absolute;left:12px;top:12px;border:1.5px solid #eee9df;background:rgba(7,17,14,.85);color:#eee9df;font:700 14px/1 inherit;font-family:inherit;padding:10px 14px;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.wmap__back:hover{background:var(--accent);border-color:var(--accent);color:var(--black)}
+.wmap__list{display:flex;flex-direction:column}
+.wmap__group{border-top:1px solid var(--line);padding:12px 0}
+.wmap__group:last-child{border-bottom:1px solid var(--line)}
+.wmap__country{display:flex;align-items:baseline;gap:10px;width:100%;background:none;border:0;color:inherit;font-family:inherit;text-align:left;cursor:pointer;padding:0;font-weight:900;font-stretch:70%;text-transform:uppercase;font-size:clamp(24px,2.4vw,32px);line-height:1;transition:color .2s}
+.wmap__country:hover,.wmap__group.is-on .wmap__country{color:var(--accent)}
+.wmap__flag{font-size:.7em}
+.wmap__n{margin-left:auto;font-weight:600;font-stretch:100%;text-transform:none;font-size:14px;color:var(--muted)}
+.wmap__chips{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.wmap__chip{border:1px solid var(--line);background:none;color:inherit;font-family:inherit;font-weight:600;font-size:14px;padding:6px 10px;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.wmap__chip i{font-style:normal;color:var(--accent);font-size:12px;margin-left:4px}
+.wmap__chip:hover,.wmap__chip.is-on{background:var(--accent);border-color:var(--accent);color:var(--black)}
+.wmap__chip:hover i,.wmap__chip.is-on i{color:var(--black)}
+@media (max-width:860px){.wmap__body{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.wmap__pulse{animation:none;opacity:0}}
+@media (max-width:560px){.wmap.is-zoomed .wmap__stage{aspect-ratio:1/1.15}}

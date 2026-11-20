@@ -7,7 +7,7 @@ Then commit the generated index.html files.
 import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = "50"  # bump to make browsers fetch fresh css/js
+V = "52"  # bump to make browsers fetch fresh css/js
 
 CDN = "https://cdn.myportfolio.com/d1dbd0b9-d7d7-43d2-ac03-eef2bbe977e5/"
 PHOTO_ME = CDN + "96b2e4b1-38e3-4fbc-bf51-d58f5eb0c1c4_rw_1920.jpg?h=ecc4ce1cb80b5c6a9a4aa10e220d145e"
@@ -515,7 +515,7 @@ def page_dj():
     <p>Playing for a crowd every weekend teaches you to read a room and change plans on the spot. That's the same thing I do in an edit. Remixes, mashups and my own tracks are past <b>500,000 streams on Spotify</b> and <b>1.5 million views on YouTube</b>.</p>
   </div>
   <nav class="jump" aria-label="On this page">
-    <a href="#shows">Shows</a><a href="#content">Social content</a><a href="#posters">Posters</a><a href="#music">Music</a><a href="#contact">Book a show</a><a class="jump__dl" href="DJZander-Rider.pdf?v=3" download>Tech rider ↓</a>
+    <a href="#shows">Shows</a><a href="#map">Map</a><a href="#content">Social content</a><a href="#posters">Posters</a><a href="#music">Music</a><a href="#contact">Book a show</a><a class="jump__dl" href="DJZander-Rider.pdf?v=3" download>Tech rider ↓</a>
   </nav>
 </section>
 </div>
@@ -533,6 +533,7 @@ def page_dj():
     <img width="1333" height="2000" loading="lazy" src="{CDN}4475cec4-844a-49d6-9e04-3eae8bce22c1_rw_1920.png?h=71246d4ed41777e5b41be6e4ed71b43b" alt="DJZander mixing">
     <img width="3840" height="2560" class="photos__d" loading="lazy" src="{CDN}657403d0-4243-46fe-b70a-8abb69768e06_rw_3840.jpg?h=efc9db612df5a4147626837a48fab024" alt="DJZander at a show">
   </div>
+{played_map()}
 </section>
 
 <div class="band invert" id="content">
@@ -647,6 +648,53 @@ REDIRECT = """<!DOCTYPE html>
 <meta http-equiv="refresh" content="0; url={to}"></head>
 <body><a href="{to}">Zander Production</a></body></html>
 """
+
+
+def played_map():
+    """'Where I've played' map. Data comes from tools/map-data.json (made by tools/map.mjs)."""
+    import json, html as H
+    m = json.load(open(os.path.join(ROOT, "tools", "map-data.json")))
+    flags = {"528": "🇳🇱", "056": "🇧🇪", "276": "🇩🇪", "826": "🇬🇧", "724": "🇪🇸", "100": "🇧🇬"}
+    order = ["528", "100", "056", "724", "276", "826"]
+    LAB = {"r": 'x="10" y="5"', "l": 'x="-10" y="5" text-anchor="end"', "b": 'x="0" y="24" text-anchor="middle"', "t": 'x="0" y="-12" text-anchor="middle"'}
+    names = {c["id"]: c["name"] for c in m["countries"] if c["played"]}
+    land = "".join(
+        f'<path d="{c["d"]}" class="is-played" data-cc="{c["id"]}"><title>{H.escape(c["name"])}</title></path>' if c["played"]
+        else f'<path d="{c["d"]}"/>' for c in m["countries"])
+    cities = "".join(
+        f'<g class="wmap__city{" is-next" if c["note"] else ""}" data-cc="{c["cc"]}" data-name="{H.escape(c["name"])}" '
+        f'data-x="{c["x"]}" data-y="{c["y"]}" transform="translate({c["x"]} {c["y"]})" tabindex="-1">'
+        f'<circle class="wmap__pulse" r="9"/><circle class="wmap__dot" r="5"/>'
+        f'<text {LAB[c.get("lab", "r")]}>{H.escape(c["name"])}{" · Dec 2026" if c["note"] else ""}</text></g>'
+        for c in m["cities"])
+    lists = []
+    for cc in order:
+        cs = [c for c in m["cities"] if c["cc"] == cc]
+        chips = "".join(
+            f'<li><button type="button" class="wmap__chip" data-cc="{cc}" data-name="{H.escape(c["name"])}">{H.escape(c["name"])}'
+            f'{" <i>Dec 2026</i>" if c["note"] else ""}</button></li>' for c in cs)
+        n = len(cs)
+        lists.append(f'<div class="wmap__group" data-cc="{cc}"><button type="button" class="wmap__country" data-cc="{cc}">'
+                     f'<span class="wmap__flag" aria-hidden="true">{flags[cc]}</span>{names[cc]}<span class="wmap__n">{n} {"city" if n == 1 else "cities"}</span></button>'
+                     f'<ul class="wmap__chips">{chips}</ul></div>')
+    total = len(m["cities"])
+    return f"""
+  <div class="wmap" id="map" data-w="{m['W']}" data-h="{m['H']}" data-zoom='{json.dumps(m["zoom"])}'>
+    <div class="wmap__head">
+      <h3>Where I've played</h3>
+      <p><b>{len(order)}</b> countries / <b>{total}</b> cities. Tap a country to zoom in.</p>
+    </div>
+    <div class="wmap__body">
+      <div class="wmap__stage">
+        <svg class="wmap__svg" viewBox="0 0 {m['W']} {m['H']}" role="img" aria-label="Map of the cities where DJZander has played">
+          <g class="wmap__land">{land}</g>
+          <g class="wmap__cities">{cities}</g>
+        </svg>
+        <button type="button" class="wmap__back" hidden>← All countries</button>
+      </div>
+      <div class="wmap__list">{"".join(lists)}</div>
+    </div>
+  </div>"""
 
 
 def write(rel, html):
